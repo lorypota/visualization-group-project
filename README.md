@@ -37,15 +37,20 @@ In Unix system:
 > source venv/bin/activate
 ```
 
-(Instead of a python virtual environment you can also use an anaconda virtual environment. 
+(Instead of a python virtual environment you can also use an anaconda virtual environment.
+ 
 Requirements:
+
 • Anaconda (https://www.anaconda.com/) or Miniconda (https://docs.conda.io/en/latest/miniconda.html)
+
 • The difference is that Anaconda has a user-friendly UI but requires a lot of space, and Miniconda is Command Prompt based, no UI, but requires considerably less space.
+
 Then you should replace the lines: python -m venv venv and venv\Scripts\activate or source venv/bin/activate with the following:
 
+```
 > conda create -n yourenvname
 > conda activate yourenvname
-
+```
 )
 
 Install all required packages by running:
