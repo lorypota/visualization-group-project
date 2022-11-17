@@ -16,11 +16,11 @@ and open your terminal/command prompt in the root folder.
 
 
 open the command prompt
-cd into the folder where you want to save the files and run the following commands. To get the HTTPS link, press the clone button in the right top corner and then copy the link under "Clone with HTTPS". 
+cd into the folder where you want to save the files and run the following commands:
 
 ```
-> git clone <HTTPS link>
-> cd <folder name on your computer>
+> git clone https://gitlab.tue.nl/s146523/jbi100-2021-2022.git
+> cd jbi100-2021-2022
 > python -m venv venv
 
 ```
@@ -36,6 +36,17 @@ In Unix system:
 ```
 > source venv/bin/activate
 ```
+
+(Instead of a python virtual environment you can also use an anaconda virtual environment. 
+Requirements:
+• Anaconda (https://www.anaconda.com/) or Miniconda (https://docs.conda.io/en/latest/miniconda.html)
+• The difference is that Anaconda has a user-friendly UI but requires a lot of space, and Miniconda is Command Prompt based, no UI, but requires considerably less space.
+Then you should replace the lines: python -m venv venv and venv\Scripts\activate or source venv/bin/activate with the following:
+
+> conda create -n yourenvname
+> conda activate yourenvname
+
+)
 
 Install all required packages by running:
 ```
