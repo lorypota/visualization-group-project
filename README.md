@@ -15,12 +15,11 @@ We suggest you to create a virtual environment for running this app with Python 
 and open your terminal/command prompt in the root folder.
 
 
-open the command prompt
-cd into the folder where you want to save the files and run the following commands:
+download a zip file of this folder, unzip it and copy it to a folder of choice on your computer
+open a command prompt and run the following commands:
 
 ```
-> git clone https://gitlab.tue.nl/s146523/jbi100-2021-2022.git
-> cd jbi100-2021-2022
+> cd <path to you folder of choice>\dashframework-main\dashframework-main 
 > python -m venv venv
 
 ```
