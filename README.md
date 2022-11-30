@@ -16,6 +16,7 @@ and open your terminal/command prompt in the root folder.
 
 
 download a zip file of this folder, unzip it and copy it to a folder of choice on your computer
+
 open a command prompt and run the following commands:
 
 ```
