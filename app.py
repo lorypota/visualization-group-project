@@ -1,19 +1,28 @@
 from jbi100_app.main import app
 from jbi100_app.views.menu import make_menu_layout
 from jbi100_app.views.scatterplot import Scatterplot
+from jbi100_app.views.choropleth import ChoroplethMap
 
 from dash import html
 import plotly.express as px
 from dash.dependencies import Input, Output
-
+import pandas as pd
+import os
 
 if __name__ == '__main__':
     # Create data
     df = px.data.iris()
 
+    # Import railroad data
+    pd.set_option('display.max_columns', None)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
+    df_railroad = pd.read_csv(data_path, delimiter=',', low_memory=False)
+
     # Instantiate custom views
     scatterplot1 = Scatterplot("Scatterplot 1", 'sepal_length', 'sepal_width', df)
     scatterplot2 = Scatterplot("Scatterplot 2", 'petal_length', 'petal_width', df)
+    choropleth = ChoroplethMap(df_railroad)
 
     app.layout = html.Div(
         id="app-container",
@@ -30,6 +39,10 @@ if __name__ == '__main__':
                 id="right-column",
                 className="nine columns",
                 children=[
+                    html.Div(
+                        choropleth,
+                        style={'marginBottom': '20px'}
+                    ),
                     scatterplot1,
                     scatterplot2
                 ],
