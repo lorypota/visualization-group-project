@@ -62,23 +62,28 @@ def merge_narration(df):
     
 
 def filter_measure_errors(df):
-
+    """Filters entries of incidents with the same id that happened at the same time
+        so that only the entry with the least amount of null features remains in the dataset."""
+    
     def get_best_entry(group):
         non_null_ratio = group.notnull().mean(axis=1)
         return group.loc[non_null_ratio.idxmax()]
     
-    # duplicated_incdtno = df[df['INCDTNO'].duplicated(keep=False)]
     grouped = df.groupby(['INCDTNO', 'YEAR', 'MONTH', 'DAY', 'TIMEHR', 'TIMEMIN'])
-    # Apply the function to each group
-    filtered_df = grouped.apply(get_best_entry).reset_index(drop=True)
+    return grouped.apply(get_best_entry).reset_index(drop=True)
     
-    return filtered_df
 
-
-def clean_columns(df):
+def format_columns(df):
+    """Formats column values in easier to manage types."""
+    
     df['PASSTRN'] = df['PASSTRN'].replace({'Y': True, 'N': False}).fillna(False)
     df['LOADED1'] = df['LOADED1'].replace({'Y': True, 'N': False})
     df['LOADED2'] = df['LOADED2'].replace({'Y': True, 'N': False})
+    df['EQATT'] = df['EQATT'].replace({'Y': True, 'N': False})
+    return df
+
+def create_datetime_column(df):
+    """Creates a datetime type column to have all time info in one place, also allowing sorting of the dataset by incident time."""
 
     df['TIMEHR'] = df['TIMEHR'].astype(str).str.replace(r'\.0$', '', regex=True)
     df['TIMEMIN'] = df['TIMEMIN'].astype(str).str.replace(r'\.0$', '', regex=True)
@@ -97,8 +102,6 @@ def clean_columns(df):
     df['DATETIME'] = pd.to_datetime(df['datetime_str'], format='%Y-%m-%d %I:%M %p', errors='coerce')
     return df.drop(columns=['datetime_str'])
 
-
-
 pd.set_option('display.max_columns', None)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
@@ -111,10 +114,9 @@ if NEW_DATA_ONLY:
     df_railroad = drop_old_entries(df_railroad)
 df_railroad = df_railroad.drop_duplicates()
 df_railroad = merge_narration(df_railroad)
-df_railroad = clean_columns(df_railroad)
-
-
+df_railroad = format_columns(df_railroad)
 df_railroad=filter_measure_errors(df_railroad)
+df_railroad=create_datetime_column(df_railroad)
 
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
