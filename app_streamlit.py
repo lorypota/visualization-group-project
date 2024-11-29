@@ -1,5 +1,7 @@
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
 import os
 from streamlit_plotly_events import plotly_events
@@ -19,35 +21,66 @@ class ChoroplethMap:
         }
 
     def get_figure(self):
-        # Count records per state and convert state codes to abbreviations
+        # base choropleth layer
         state_counts = self.df.groupby(
             ['STATE']).size().reset_index(name='count')
         state_counts['STATE'] = state_counts['STATE'].map(self.state_codes)
 
-        fig = px.choropleth(
-            state_counts,
-            locations='STATE',
-            locationmode="USA-states",
-            color='count',
-            scope="usa",
-            color_continuous_scale="YlOrRd",
-            range_color=[state_counts['count'].min(
-            ), state_counts['count'].max()],
-        )
+        fig = go.Figure()
 
+        # Add choropleth layer
+        fig.add_trace(go.Choropleth(
+            locations=state_counts['STATE'],
+            z=state_counts['count'],
+            locationmode="USA-states",
+            colorscale="YlOrRd",
+            zmin=state_counts['count'].min(),
+            zmax=state_counts['count'].max(),
+            name="State Incidents",
+            colorbar_title="Number of Incidents"
+        ))
+
+        # Add scatter points for individual incidents
+        fig.add_trace(go.Scattergeo(
+            lon=self.df['Longitude'],
+            lat=self.df['Latitude'],
+            mode='markers',
+            marker=dict(
+                size=4,
+                color='blue',
+                opacity=0.6
+            ),
+            name="Incident Locations",
+            hovertext=self.df.apply(
+                lambda row: f"State: {self.state_codes.get(
+                    row['STATE'], 'Unknown')}<br>"
+                f"Date: {row.get('DATE', 'Unknown')}<br>"
+                f"Location: ({row['Latitude']:.2f}, {row['Longitude']:.2f})",
+                axis=1
+            ),
+            hoverinfo="text"
+        ))
+
+        # Update layout
         fig.update_layout(
             height=600,
             margin={"r": 20, "t": 30, "l": 20, "b": 20},
-            coloraxis_colorbar_title="Number of Incidents",
             geo=dict(
                 scope='usa',
                 projection=dict(type='albers usa'),
                 showlakes=True,
-                lakecolor='rgb(255, 255, 255)'
+                lakecolor='rgb(255, 255, 255)',
+                showland=True,
+                landcolor='rgb(240, 240, 240)',
             ),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font=dict(color='black'),
+            legend=dict(
+                x=0,
+                y=1,
+                bgcolor='rgba(255, 255, 255, 0.7)'
+            )
         )
 
         return fig
@@ -58,7 +91,8 @@ def main():
 
     # Import railroad data
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
+    data_path = os.path.join(
+        current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
     df_railroad = pd.read_csv(data_path, delimiter=',', low_memory=False)
 
     # Sidebar (Menu)
@@ -66,9 +100,9 @@ def main():
     st.sidebar.write("JBI100 visualization project")
 
     # Main content
-    # Choropleth Map
+    # Choropleth Map with Points
     choropleth = ChoroplethMap(df_railroad)
-    st.subheader("Railroad Incidents by State")
+    st.subheader("Railroad Incidents by State with Location Points")
     st.plotly_chart(choropleth.get_figure(), use_container_width=True)
 
 
