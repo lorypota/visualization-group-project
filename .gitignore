@@ -9,6 +9,7 @@ Notebooks/
 # Dataset
 Railroad_Incidents/Railroad_Equipment_Accident_Incident_Source_Data__Form_54__20241026.csv
 Railroad_Incidents/Dataset.csv
+Railroad_Incidents/CleanedDataset.csv
 
 # Codealike
 codealike.json
