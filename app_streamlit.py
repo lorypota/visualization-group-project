@@ -58,7 +58,7 @@ def main():
 
     # Import railroad data
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
+    data_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
     df_railroad = pd.read_csv(data_path, delimiter=',', low_memory=False)
 
     # Sidebar (Menu)
