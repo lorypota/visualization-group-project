@@ -13,6 +13,7 @@ def drop_redudant_columns(df):
     df = df.drop(columns=["IYR", "IYR2", "IYR3", "YEAR", "IMO", "IMO2", "IMO3",
                           "CASINJRR", "CASKLDRR"], axis=1, errors='ignore')
     df.rename(columns={'YEAR4': 'YEAR'}, inplace=True)
+    df.rename(columns={'Longitud': 'Longitude'}, inplace=True)
     return df
 
 
