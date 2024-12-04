@@ -1,13 +1,16 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
+import os
 # Mapbox token
 MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibWdnaW9yZGFubyIsImEiOiJjbTNweXYycXIwOWJ6MmxzZDVwM3I3eTF1In0.0MLyHVjtBOB7HP_dk7DTsw"
 
 # File path to the dataset
-file_path = '/Users/matteogennarogiordano/ProgrammingProjects/Visualization_Project/Railroad_Incidents/CleanedDataset.csv'  # Replace with the correct path to your file
-data = pd.read_csv(file_path)
+# Import railroad data
+current_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(
+    current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
+data = pd.read_csv(data_path)
 
 # Filter data to exclude rows with missing or zero lat/long
 map_data = data[(data['Latitude'] != 0) & (data['Longitude'] != 0)].copy()
