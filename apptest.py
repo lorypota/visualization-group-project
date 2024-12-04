@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from dotenv import load_dotenv
+import os
 
-# Mapbox token
-MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibWdnaW9yZGFubyIsImEiOiJjbTNweXYycXIwOWJ6MmxzZDVwM3I3eTF1In0.0MLyHVjtBOB7HP_dk7DTsw"
+load_dotenv()
+MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
 # File path to the dataset
 file_path = 'Railroad_Incidents/CleanedDataset.csv'
@@ -20,13 +22,20 @@ st.set_page_config(layout="wide")
 
 # Sidebar for date filter
 st.sidebar.header("Filters")
+# Sidebar for date filter
+st.sidebar.header("Filters")
 start_date = st.sidebar.date_input(
-    "Start Date", map_data['DATETIME'].min().date()
+    "Start Date",
+    map_data['DATETIME'].min().date(),
+    min_value=map_data['DATETIME'].min().date(),
+    max_value=map_data['DATETIME'].max().date()
 )
 end_date = st.sidebar.date_input(
-    "End Date", map_data['DATETIME'].max().date()
+    "End Date",
+    map_data['DATETIME'].max().date(),
+    min_value=map_data['DATETIME'].min().date(),
+    max_value=map_data['DATETIME'].max().date()
 )
-
 # Toggle for map selection
 map_choice = st.sidebar.radio(
     "Choose Map Region:",
