@@ -6,7 +6,7 @@ import plotly.express as px
 MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibWdnaW9yZGFubyIsImEiOiJjbTNweXYycXIwOWJ6MmxzZDVwM3I3eTF1In0.0MLyHVjtBOB7HP_dk7DTsw"
 
 # File path to the dataset
-file_path = '/Users/matteogennarogiordano/ProgrammingProjects/Visualization_Project/Railroad_Incidents/CleanedDataset.csv'  # Replace with the correct path to your file
+file_path = 'Railroad_Incidents/CleanedDataset.csv'
 data = pd.read_csv(file_path)
 
 # Filter data to exclude rows with missing or zero lat/long
@@ -74,8 +74,6 @@ else:
         mapbox=dict(
             accesstoken=MAPBOX_ACCESS_TOKEN,
             style="mapbox://styles/mapbox/streets-v12",
-            filter=["!=", "class", "motorway"],
-            paint={"line-opacity": 0}
         ),
         margin={"r": 0, "t": 30, "l": 0, "b": 0},
     )
