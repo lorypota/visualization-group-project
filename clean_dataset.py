@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 SPARSENESS_THRESHOLD = 0.99 # All columns where there are (SPARSENESS_THRESHOLD * 100)% n/a values will be dropped
-NEW_DATA_ONLY = True # If True, all data entries preceding 2002 will be dropped
+NEW_DATA_ONLY = True # If True, all data entries preceding 2011 will be dropped
 
 
 def drop_redudant_columns(df):
@@ -23,15 +23,6 @@ def drop_dummy_columns(df):
                             "ADJUNCT1", "ADJUNCT2", "ADJUNCT3", "SSB1", "SSB2"], axis=1, errors='ignore')
     
 
-def drop_old_entries(df):
-    """Drop all entries preceding 2002."""
-
-    count_old = df[df['YEAR'] < 2002].shape[0]
-    count_new = df[df['YEAR'] >= 2002].shape[0]
-    print(f"Deleting {count_old} records from 2001 or earlier, {count_new} records remain.")
-    return df[df['YEAR'] >= 2002]
-
-
 def drop_sparse_columns(df, threshold):
     """Drops all columns with a null entry ratio greater than a given threshold."""
 
@@ -40,6 +31,69 @@ def drop_sparse_columns(df, threshold):
     # Filter column names where the null rate exceeds the threshold
     high_null_columns = null_rates[null_rates > threshold].index.tolist()
     return df.drop(columns=high_null_columns, axis=1, errors='ignore')
+
+
+def drop_old_entries(df):
+    """Drop all entries preceding 2011."""
+
+    count_old = df[df['YEAR'] < 2011].shape[0]
+    count_new = df[df['YEAR'] >= 2011].shape[0]
+    print(f"Deleting {count_old} records from 2001 or earlier, {count_new} records remain.")
+    return df[df['YEAR'] >= 2011]
+
+
+def drop_error_entries(df):
+    """Drops all entries where the coordinates are mistakinly either in the ocean or outside of USA territory."""
+
+    # Define approximate USA boundary (continental only)
+    min_latitude = 24.396308   # Southernmost point (Hawaii excluded)
+    max_latitude = 49   # Northernmost point
+    min_longitude = -125.0     # Westernmost point
+    max_longitude = -66.93457  # Easternmost point
+
+    # Define approximate Alaska boundaries
+    alaska_min_latitude = 51.2097    # Southernmost point in Alaska
+    alaska_max_latitude = 71.5388    # Northernmost point in Alaska
+    alaska_min_longitude = -179.1489 # Westernmost point in Alaska
+    alaska_max_longitude = -129.9795 # Easternmost point in Alaska
+
+    # Filter rows within the USA boundary
+    df = df[
+        (
+            (df['Latitude'] >= min_latitude) & 
+            (df['Latitude'] <= max_latitude) &
+            (df['Longitude'] >= min_longitude) & 
+            (df['Longitude'] <= max_longitude)
+        ) |
+        (
+            (df['Latitude'] >= alaska_min_latitude) & 
+            (df['Latitude'] <= alaska_max_latitude) &
+            (df['Longitude'] >= alaska_min_longitude) & 
+            (df['Longitude'] <= alaska_max_longitude)
+        ) |
+        (
+            (df['Latitude'] == 0) &
+            (df['Longitude'] == 0)
+        )
+    ]
+
+    # Drop remaining error entries
+    df = df[~((df['Latitude'] == 40.194395) & (df['Longitude'] == -71.795028))]
+    df = df[~((df['Latitude'] == 40.450002) & (df['Longitude'] == -73.550081))]
+    df = df[~((df['Latitude'] == 45.349) & (df['Longitude'] == -67.06))]
+    df = df[~((df['Latitude'] == 44.4493) & (df['Longitude'] == -81.67709))]
+    df = df[~((df['Latitude'] == 42.191607) & (df['Longitude'] == -83.075516))]
+    df = df[~((df['Latitude'] == 42.160202) & (df['Longitude'] == -83.082612))]
+    df = df[
+            ~(
+                (df['Latitude'] >= 31.758696 - 0.0001) & 
+                (df['Latitude'] <= 31.758696 + 0.0001) & 
+                (df['Longitude'] >= -116.500855 - 0.0001) & 
+                (df['Longitude'] <= -116.500855 + 0.0001)
+            )
+        ]    
+    df = df[~((df['Latitude'] == 32.35343) & (df['Longitude'] == -116.31232))]
+    return df
 
 
 def merge_narration(df):
@@ -63,12 +117,16 @@ def merge_narration(df):
     
 
 def filter_measure_errors(df):
-    """Filters entries of incidents with the same id that happened at the same time
-        so that only the entry with the least amount of null features remains in the dataset."""
-    
+    """
+    Filters entries of incidents with the same ID that happened at the same time,
+    keeping only the most recent entry (assumed to be the last in the current index order).
+    """
+    # def get_best_entry(group):
+    #     non_null_ratio = group.notnull().mean(axis=1)
+    #     return group.loc[non_null_ratio.idxmax()]
+
     def get_best_entry(group):
-        non_null_ratio = group.notnull().mean(axis=1)
-        return group.loc[non_null_ratio.idxmax()]
+        return group.iloc[-1]  # Keep the last entry in the group
     
     grouped = df.groupby(['INCDTNO', 'YEAR', 'MONTH', 'DAY', 'TIMEHR', 'TIMEMIN'])
     return grouped.apply(get_best_entry).reset_index(drop=True)
@@ -82,6 +140,7 @@ def format_columns(df):
     df['LOADED2'] = df['LOADED2'].replace({'Y': True, 'N': False})
     df['EQATT'] = df['EQATT'].replace({'Y': True, 'N': False})
     return df
+
 
 def create_datetime_column(df):
     """Creates a datetime type column to have all time info in one place, also allowing sorting of the dataset by incident time."""
@@ -103,6 +162,16 @@ def create_datetime_column(df):
     df['DATETIME'] = pd.to_datetime(df['datetime_str'], format='%Y-%m-%d %I:%M %p', errors='coerce')
     return df.drop(columns=['datetime_str'])
 
+
+def replace_null_coordinates(df):
+    """
+    Replaces null values in the 'Latitude' and 'Longitude' columns with 0.
+    """
+    df['Latitude'] = df['Latitude'].fillna(0)
+    df['Longitude'] = df['Longitude'].fillna(0)
+    return df
+
+
 pd.set_option('display.max_columns', None)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
@@ -111,6 +180,8 @@ df_railroad = pd.read_csv(data_path, delimiter=',', low_memory=False)
 df_railroad = drop_dummy_columns(df_railroad)
 df_railroad = drop_redudant_columns(df_railroad)
 df_railroad = drop_sparse_columns(df_railroad, threshold=SPARSENESS_THRESHOLD)
+df_railroad=replace_null_coordinates(df_railroad)
+df_railroad=drop_error_entries(df_railroad)
 if NEW_DATA_ONLY:
     df_railroad = drop_old_entries(df_railroad)
 df_railroad = df_railroad.drop_duplicates()
