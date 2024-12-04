@@ -42,7 +42,7 @@ class ChoroplethMap:
 
         # Add scatter points for individual incidents
         fig.add_trace(go.Scattergeo(
-            lon=self.df['Longitud'],
+            lon=self.df['Longitude'],
             lat=self.df['Latitude'],
             mode='markers',
             marker=dict(
@@ -55,7 +55,7 @@ class ChoroplethMap:
                 lambda row: f"State: {self.state_codes.get(
                     row['STATE'], 'Unknown')}<br>"
                 f"Date: {row.get('DATE', 'Unknown')}<br>"
-                f"Location: ({row['Latitude']:.2f}, {row['Longitud']:.2f})",
+                f"Location: ({row['Latitude']:.2f}, {row['Longitude']:.2f})",
                 axis=1
             ),
             hoverinfo="text"
