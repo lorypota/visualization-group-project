@@ -7,10 +7,27 @@ from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
 st.set_page_config(layout="wide")
 
 st.markdown(
-    """
+    """ 
     <style>
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
+            overflow: hidden; /* Prevent unwanted scrolling */
+        }
         [data-testid="stSidebar"][aria-expanded="true"] {
             min-width: 330px;
+        }
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
+        .full-screen-map {
+            height: calc(100vh); /* Full viewport height minus Streamlit padding */
+            margin: 0;
+            padding: 0;
+            top: 0;
+        }
+        .block-container {
+            padding: 0 !important; /* Change default padding around the Streamlit container */
+        }
+        .stMainBlockContainer .stVerticalBlock {
+            gap: 0rem !important;
         }
     </style>
     """,
@@ -21,8 +38,6 @@ st.markdown(
 def initialize_data():
     if 'map_data' not in st.session_state:
         data = pd.read_csv(DATA_PATH, low_memory=False)
-        # Filter out invalid coords
-        data = data[(data['Latitude'] != 0) & (data['Longitude'] != 0)].copy()
         data['DATETIME'] = pd.to_datetime(data['DATETIME'])
         st.session_state.map_data = data
 
@@ -30,7 +45,7 @@ def initialize_data():
 def initialize_figure():
     if 'fig' not in st.session_state:
         st.session_state.fig = create_base_figure()
-
+    
 
 def main():
     initialize_data()
@@ -81,7 +96,7 @@ def main():
 
     # Update the figure data
     update_figure_data(st.session_state.fig, filtered_data)
-
+    
     # Display the figure
     st.plotly_chart(
         st.session_state.fig,
@@ -92,8 +107,20 @@ def main():
             'scrollZoom': True,
             'displaylogo': False,
             'modeBarButtonsToRemove': ['resetScale2d']
-        }
+        },
+        class_name="full-screen-map"
     )
+
+    container1, container2 = st.columns(2)
+    with container1:
+        st.subheader("Container 1")
+        st.write("This is the first container.")
+        # Add content for the first container
+
+    with container2:
+        st.subheader("Container 2")
+        st.write("This is the second container.")
+        # Add content for the second container
 
 
 if __name__ == "__main__":
