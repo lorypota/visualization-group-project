@@ -2,14 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
+
 # Mapbox token
 MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibWdnaW9yZGFubyIsImEiOiJjbTNweXYycXIwOWJ6MmxzZDVwM3I3eTF1In0.0MLyHVjtBOB7HP_dk7DTsw"
 
 # File path to the dataset
-# Import railroad data
 current_dir = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(
-    current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
+data_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 data = pd.read_csv(data_path)
 
 # Filter data to exclude rows with missing or zero lat/long
@@ -18,23 +17,20 @@ map_data = data[(data['Latitude'] != 0) & (data['Longitude'] != 0)].copy()
 # Convert DATETIME to datetime format
 map_data['DATETIME'] = pd.to_datetime(map_data['DATETIME'])
 
+# Add a column to differentiate between regions
+map_data['Region'] = map_data.apply(
+    lambda row: 'Alaska' if row['Latitude'] > 50 and row['Longitude'] < -130 else 'Continental USA', axis=1
+)
 # Streamlit layout
 st.set_page_config(layout="wide")
 
 # Sidebar for date filter
 st.sidebar.header("Filters")
-start_date = st.sidebar.date_input(
-    "Start Date", map_data['DATETIME'].min().date()
-)
-end_date = st.sidebar.date_input(
-    "End Date", map_data['DATETIME'].max().date()
-)
+start_date = st.sidebar.date_input("Start Date", map_data['DATETIME'].min().date())
+end_date = st.sidebar.date_input("End Date", map_data['DATETIME'].max().date())
 
-# Toggle for map selection
-map_choice = st.sidebar.radio(
-    "Choose Map Region:",
-    ("Continental USA", "Alaska"),
-)
+# Toggle for region selection
+selected_region = st.sidebar.selectbox("Select Region:", ("All", "Continental USA", "Alaska"))
 
 # Ensure valid date range
 if start_date > end_date:
@@ -46,42 +42,45 @@ else:
         (map_data['DATETIME'] <= pd.to_datetime(end_date))
     ]
 
-    # Filter data for Alaska and Continental USA
-    alaska_data = filtered_data[(filtered_data['Latitude'] > 50) & (filtered_data['Longitude'] < -130)]
-    usa_data = filtered_data[~((filtered_data['Latitude'] > 50) & (filtered_data['Longitude'] < -130))]
+    # Filter by selected region
+    if selected_region != "All":
+        filtered_data = filtered_data[filtered_data['Region'] == selected_region]
 
-    # Determine which map to display
-    if map_choice == "Continental USA":
-        map_data = usa_data
-        center_coords = {"lat": 39.8, "lon": -98.6}
-        zoom_level = 3.5
-        title = "Map: Continental USA"
-    else:  # "Alaska"
-        map_data = alaska_data
-        center_coords = {"lat": 64.2, "lon": -150}
-        zoom_level = 3.5
-        title = "Map: Alaska"
-
-    # Plot the selected map
+    # Plot the map
     map_fig = px.scatter_mapbox(
-        map_data,
+        filtered_data,
         lat="Latitude",
         lon="Longitude",
         hover_name="DATETIME",
-        zoom=zoom_level,
-        center=center_coords,
-        title=title,
+        zoom=3.5,
+        title=f"Map: {selected_region if selected_region != 'All' else 'All Regions'}",
+        color="Region",
+        color_discrete_map={"Continental USA": "blue", "Alaska": "green"},
     )
 
     map_fig.update_layout(
         mapbox=dict(
             accesstoken=MAPBOX_ACCESS_TOKEN,
             style="mapbox://styles/mapbox/streets-v12",
-            filter=["!=", "class", "motorway"],
-            paint={"line-opacity": 0}
         ),
         margin={"r": 0, "t": 30, "l": 0, "b": 0},
     )
 
     # Display the map
     st.plotly_chart(map_fig, use_container_width=True)
+
+
+    # Additional Graph: Bar Chart of Incidents per State
+    st.markdown("### Additional Graphs")
+    st.write("Bar Chart of Incidents per State")
+    bar_chart_data = filtered_data.groupby('STATE').size().reset_index(name='Count')
+    print(bar_chart_data)
+    fig_bar = px.bar(
+        bar_chart_data,
+        x='STATE',
+        y='Count',
+        title="Incidents per State",
+        labels={'STATE': 'State', 'Count': 'Number of Incidents'},
+    )
+
+    st.plotly_chart(fig_bar, use_container_width=True)
