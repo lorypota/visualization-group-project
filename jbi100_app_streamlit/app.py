@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-from filters import filter_by_date, filter_by_states
+from filters import filter_by_date, filter_by_types, filter_by_states
 from map_visualization import create_base_figure, update_figure_data
-from config import STATE_CODES, DATA_PATH
+from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
 
 st.set_page_config(layout="wide")
 
@@ -52,8 +52,19 @@ def main():
         max_value=st.session_state.map_data['DATETIME'].max().date()
     )
 
+    # Incident Type filters
+    with st.sidebar.expander("Incident Types", expanded=True):
+        cols = st.columns(2)  # Using 2 columns for incident types
+        types_per_col = -(-len(TYPE_DESCRIPTIONS) // 2)
+        selected_types = {}
+        for i, (code, description) in enumerate(TYPE_DESCRIPTIONS.items()):
+            col_index = i // types_per_col
+            key = f"type_{code}"
+            selected_types[description] = cols[col_index].checkbox(
+                description, value=True, key=key)
+
     # State filters
-    with st.sidebar.expander("State Filters", expanded=True):
+    with st.sidebar.expander("States", expanded=True):
         cols = st.columns(4)
         states_per_col = -(-len(STATE_CODES) // 4)
         selected_states = {}
@@ -65,6 +76,7 @@ def main():
 
     # Apply filters
     filtered_data = filter_by_date(st.session_state.map_data, start_date, end_date)
+    filtered_data = filter_by_types(filtered_data, selected_types)
     filtered_data = filter_by_states(filtered_data, selected_states)
 
     # Update the figure data

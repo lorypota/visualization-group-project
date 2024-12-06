@@ -1,5 +1,5 @@
 import pandas as pd
-from config import STATE_CODES
+from config import STATE_CODES, TYPE_DESCRIPTIONS
 
 
 def filter_by_date(data, start_date, end_date):
@@ -17,6 +17,12 @@ def filter_by_states(data, selected_states):
                             for state, selected in selected_states.items() if selected]
     return data[data['STATE'].isin(selected_state_codes)]
 
+
+def filter_by_types(data, selected_types):
+    """Filter map data based on selected incident types."""
+    selected_type_codes = [int(code) for code, description in TYPE_DESCRIPTIONS.items()
+                           if selected_types.get(description, False)]
+    return data[data['TYPE'].isin(selected_type_codes)]
 
 def filter_by_region(data, region):
     """
