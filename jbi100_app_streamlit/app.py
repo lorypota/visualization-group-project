@@ -8,21 +8,46 @@ load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
 # File path to the dataset
-file_path = 'Railroad_Incidents/CleanedDataset.csv'
+file_path = '../Railroad_Incidents/CleanedDataset.csv'
 data = pd.read_csv(file_path)
 
-# Filter data to exclude rows with missing or zero lat/long
-map_data = data[(data['Latitude'] != 0) & (data['Longitude'] != 0)].copy()
-
-# Convert DATETIME to datetime format
+# Filter data to exclude rows with missing or zero lat/long and convert to datetime format
+map_data = data[(data['Latitude'] != 0) & (data['Longitude'] != 0)].copy() # To move in clean_dataset.py
 map_data['DATETIME'] = pd.to_datetime(map_data['DATETIME'])
+
+# TYPE
+type_colors = px.colors.qualitative.Set3
+type_descriptions = {
+    '01': 'Derailment',
+    '02': 'Head on collision',
+    '03': 'Rearend collision',
+    '04': 'Side collision',
+    '05': 'Raking collision',
+    '06': 'Broken train collision',
+    '07': 'Hwy-rail crossing',
+    '08': 'RR Grad crossing',
+    '09': 'Obstruction',
+    '10': 'Explosive-detonation',
+    '11': 'Fire/violent rupture',
+    '12': 'Other impacts',
+    '13': 'Other'
+}
+
+# State codes
+state_codes = {
+    1: 'AL', 2: 'AK', 4: 'AZ', 5: 'AR', 6: 'CA', 8: 'CO', 9: 'CT', 10: 'DE',
+    11: 'DC', 12: 'FL', 13: 'GA', 15: 'HI', 16: 'ID', 17: 'IL', 18: 'IN', 19: 'IA',
+    20: 'KS', 21: 'KY', 22: 'LA', 23: 'ME', 24: 'MD', 25: 'MA', 26: 'MI', 27: 'MN',
+    28: 'MS', 29: 'MO', 30: 'MT', 31: 'NE', 32: 'NV', 33: 'NH', 34: 'NJ', 35: 'NM',
+    36: 'NY', 37: 'NC', 38: 'ND', 39: 'OH', 40: 'OK', 41: 'OR', 42: 'PA', 44: 'RI',
+    45: 'SC', 46: 'SD', 47: 'TN', 48: 'TX', 49: 'UT', 50: 'VT', 51: 'VA', 53: 'WA',
+    54: 'WV', 55: 'WI', 56: 'WY'
+}
+
 
 # Streamlit layout
 st.set_page_config(layout="wide")
 
-# Sidebar for date filter
-st.sidebar.header("Filters")
-# Sidebar for date filter
 st.sidebar.header("Filters")
 start_date = st.sidebar.date_input(
     "Start Date",
