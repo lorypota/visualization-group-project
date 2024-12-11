@@ -1,9 +1,14 @@
+import streamlit as st
 import plotly.express as px
+import pandas as pd
+import json
 from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS
 
 DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
 STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
 
+selected_data = None
+unselected_data = None
 
 def create_base_figure():
     config = MAP_CONFIGS["Continental USA"]
@@ -27,6 +32,51 @@ def create_base_figure():
     return fig
 
 
+
+def map(fig, data, selected_filter):
+    selected_markers = st.plotly_chart(
+        st.session_state.fig,
+        key="main_map",
+        use_container_width=True,
+        config={
+            'displayModeBar': True,
+            'scrollZoom': True,
+            'displaylogo': False,
+            'modeBarButtonsToRemove': ['resetScale2d']
+        },
+        class_name="full-screen-map",
+        on_select="rerun",
+    )
+    selected_markers = json.dumps(selected_markers)
+    
+    if selected_markers:
+        # Extract latitudes and longitudes from selected_markers
+        selection = json.loads(selected_markers)['selection']
+        selected_coords = {
+            (point['lat'], point['lon'])
+            for point in selection['points']
+        }
+        
+        global selected_data
+        global unselected_data
+
+        # Identify rows in the dataset that match selected markers
+        selected_data = data[data.apply(
+            lambda row: (row['Latitude'], row['Longitude']) in selected_coords, axis=1
+        )].copy()
+
+        unselected_data = data[data.apply(
+            lambda row: (row['Latitude'], row['Longitude']) not in selected_coords, axis=1
+        )].copy()
+
+        # Add hover labels without mutating the original DataFrame
+        selected_data['hover_label'] = 'Selected'
+        unselected_data['hover_label'] = 'Unselected'
+        
+
+
+
+
 def marker_properties_selected():
     return dict(size=6, opacity=0.8, color='red')
 
@@ -35,8 +85,10 @@ def marker_properties_unselected():
     return dict(size=5, opacity=0.4, color='#FFCCCB')
 
 
-def update_figure_data(fig, data, selected_filter):
+def update_figure_data(fig, data, selected_filter, selected_markers=None):
     # Separate selected and unselected data
+    global selected_data
+    global unselected_data
     selected_data = data[selected_filter].copy()
     unselected_data = data[~selected_filter].copy()
 

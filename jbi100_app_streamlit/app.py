@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from filters import filter_by_date, filter_by_types, filter_by_states
-from map_visualization import create_base_figure, update_figure_data
+from map_visualization import create_base_figure, update_figure_data, map
 from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
 
 st.set_page_config(layout="wide")
@@ -134,19 +134,9 @@ def main():
                        st.session_state.map_data, selected_filter)
 
     # Display the figure
-    st.plotly_chart(
-        st.session_state.fig,
-        key="main_map",
-        use_container_width=True,
-        config={
-            'displayModeBar': True,
-            'scrollZoom': True,
-            'displaylogo': False,
-            'modeBarButtonsToRemove': ['resetScale2d']
-        },
-        class_name="full-screen-map"
-    )
-
+    map(st.session_state.fig,
+        st.session_state.map_data, selected_filter)
+    
     # example containers
     container1, container2 = st.columns(2)
     with container1:
