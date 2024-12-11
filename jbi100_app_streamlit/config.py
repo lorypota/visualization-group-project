@@ -6,7 +6,7 @@ load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
 # File paths
-DATA_PATH = '../Railroad_Incidents/CleanedDataset.csv'
+DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
 
 # Map configurations
 MAP_CONFIGS = {
