@@ -24,7 +24,7 @@ st.markdown(
             top: 0;
         }
         .block-container {
-            padding: 0 !important; /* Change default padding around the Streamlit container */
+            padding: 0 !important;
         }
         .stMainBlockContainer .stVerticalBlock {
             gap: 0rem !important;
@@ -68,9 +68,19 @@ def main():
     )
 
     # Incident Type filters
-    with st.sidebar.expander("Incident Types", expanded=True):
+    with st.sidebar.expander("Incident Types", expanded=False):
         cols = st.columns(2)  # Using 2 columns for incident types
         types_per_col = -(-len(TYPE_DESCRIPTIONS) // 2)
+
+        # Add Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_types"):
+            for code in TYPE_DESCRIPTIONS.keys():
+                st.session_state[f"type_{code}"] = True
+        if col2.button("Deselect All", key="deselect_all_types"):
+            for code in TYPE_DESCRIPTIONS.keys():
+                st.session_state[f"type_{code}"] = False
+
         selected_types = {}
         for i, (code, description) in enumerate(TYPE_DESCRIPTIONS.items()):
             col_index = i // types_per_col
@@ -79,15 +89,28 @@ def main():
                 description, value=True, key=key)
 
     # State filters
-    with st.sidebar.expander("States", expanded=True):
+    with st.sidebar.expander("States", expanded=False):  # Start folded
         cols = st.columns(4)
         states_per_col = -(-len(STATE_CODES) // 4)
+
+        # Add Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All"):
+            for state in STATE_CODES.values():
+                st.session_state[f"state_{state}"] = True
+        if col2.button("Deselect All"):
+            for state in STATE_CODES.values():
+                st.session_state[f"state_{state}"] = False
+
         selected_states = {}
         for i, (code, state) in enumerate(STATE_CODES.items()):
             col_index = i // states_per_col
             key = f"state_{state}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Initialize all checkboxes as True
             selected_states[state] = cols[col_index].checkbox(
-                state, value=True, key=key)
+                state, value=st.session_state[key], key=key
+            )
 
     # Apply filters
     filtered_data = filter_by_date(st.session_state.map_data, start_date, end_date)
@@ -110,6 +133,7 @@ def main():
         },
         class_name="full-screen-map"
     )
+   
 
     container1, container2 = st.columns(2)
     with container1:
