@@ -1,6 +1,8 @@
 import plotly.express as px
 from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS
 
+DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
+STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
 
 def create_base_figure():
     config = MAP_CONFIGS["Continental USA"]
@@ -13,7 +15,7 @@ def create_base_figure():
     fig.update_layout(
         mapbox=dict(
             accesstoken=MAPBOX_ACCESS_TOKEN,
-            style="mapbox://styles/mapbox/streets-v12",
+            style=DEFAULT_STYLE,
             bounds={"west": MAP_CONFIGS['bounding_boxes']["lon"][0], "east": MAP_CONFIGS['bounding_boxes']["lon"][1],
                     "south": MAP_CONFIGS['bounding_boxes']["lat"][0], "north": MAP_CONFIGS['bounding_boxes']["lat"][1]},
         ),
