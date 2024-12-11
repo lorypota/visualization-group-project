@@ -45,7 +45,7 @@ def initialize_data():
 def initialize_figure():
     if 'fig' not in st.session_state:
         st.session_state.fig = create_base_figure()
-    
+
 
 def main():
     initialize_data()
@@ -85,11 +85,13 @@ def main():
         for i, (code, description) in enumerate(TYPE_DESCRIPTIONS.items()):
             col_index = i // types_per_col
             key = f"type_{code}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default: all selected
             selected_types[description] = cols[col_index].checkbox(
-                description, value=True, key=key)
+                description, value=st.session_state[key], key=key)
 
     # State filters
-    with st.sidebar.expander("States", expanded=False):  # Start folded
+    with st.sidebar.expander("States", expanded=False):
         cols = st.columns(4)
         states_per_col = -(-len(STATE_CODES) // 4)
 
@@ -107,19 +109,30 @@ def main():
             col_index = i // states_per_col
             key = f"state_{state}"
             if key not in st.session_state:
-                st.session_state[key] = True  # Initialize all checkboxes as True
+                st.session_state[key] = True  # Default: all selected
             selected_states[state] = cols[col_index].checkbox(
                 state, value=st.session_state[key], key=key
             )
 
-    # Apply filters
-    filtered_data = filter_by_date(st.session_state.map_data, start_date, end_date)
-    filtered_data = filter_by_types(filtered_data, selected_types)
-    filtered_data = filter_by_states(filtered_data, selected_states)
+    # Apply filters to create a selected_filter mask
+    reverse_state_codes = {v: k for k, v in STATE_CODES.items()}
+    selected_filter = (
+        (st.session_state.map_data['DATETIME'] >= pd.to_datetime(start_date)) &
+        (st.session_state.map_data['DATETIME'] <= pd.to_datetime(end_date)) &
+        (st.session_state.map_data['TYPE'].isin(
+            [int(code) for code, description in TYPE_DESCRIPTIONS.items()
+             if selected_types.get(description, False)]
+        )) &
+        (st.session_state.map_data['STATE'].isin(
+            [reverse_state_codes[state]
+                for state, selected in selected_states.items() if selected]
+        ))
+    )
 
     # Update the figure data
-    update_figure_data(st.session_state.fig, filtered_data)
-    
+    update_figure_data(st.session_state.fig,
+                       st.session_state.map_data, selected_filter)
+
     # Display the figure
     st.plotly_chart(
         st.session_state.fig,
@@ -133,18 +146,16 @@ def main():
         },
         class_name="full-screen-map"
     )
-   
 
+    # example containers
     container1, container2 = st.columns(2)
     with container1:
         st.subheader("Container 1")
         st.write("This is the first container.")
-        # Add content for the first container
 
     with container2:
         st.subheader("Container 2")
         st.write("This is the second container.")
-        # Add content for the second container
 
 
 if __name__ == "__main__":
