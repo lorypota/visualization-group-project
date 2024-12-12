@@ -5,7 +5,7 @@ import os
 
 SPARSENESS_THRESHOLD = 0.99 # All columns where there are (SPARSENESS_THRESHOLD * 100)% n/a values will be dropped
 NEW_DATA_ONLY = True # If True, all data entries preceding 2011 will be dropped
-
+DROP_0_COORD = True # If True, all data entries with coordinates 0,0 will be dropped
 
 def drop_redudant_columns(df):
     """Drops columns that convey info already present in other existing columns."""
@@ -172,6 +172,13 @@ def replace_null_coordinates(df):
     return df
 
 
+def drop_0_coord_entries(df):
+    """
+    Drops all entries where coordinates are 0,0.
+    """
+    return df[(df['Latitude'] != 0) & (df['Longitude'] != 0)].copy()
+
+
 pd.set_option('display.max_columns', None)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
@@ -189,6 +196,8 @@ df_railroad = merge_narration(df_railroad)
 df_railroad = format_columns(df_railroad)
 df_railroad=filter_measure_errors(df_railroad)
 df_railroad=create_datetime_column(df_railroad)
-
+if DROP_0_COORD:
+    df_railroad=drop_0_coord_entries(df_railroad)
+    
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)

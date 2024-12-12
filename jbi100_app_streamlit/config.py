@@ -6,7 +6,7 @@ load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
 # File paths
-DATA_PATH = '../Railroad_Incidents/CleanedDataset.csv'
+DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
 
 # Map configurations
 MAP_CONFIGS = {
@@ -14,9 +14,9 @@ MAP_CONFIGS = {
         "center_coords": {"lat": 39.8, "lon": -98.6},
         "zoom_level": 3.5
     },
-    "Alaska": {
-        "center_coords": {"lat": 64.2, "lon": -150},
-        "zoom_level": 3.5
+    'bounding_boxes': {
+        "lat": [21, 52],  # Min and max latitudes
+        "lon": [-150.0, -40]    # Min and max longitudes
     }
 }
 

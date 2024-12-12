@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "configurations": [
+    {
+      "name": "Launch Streamlit App",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": ["run", "${workspaceFolder}/jbi100_app_streamlit/app.py"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
