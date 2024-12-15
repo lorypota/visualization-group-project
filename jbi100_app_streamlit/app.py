@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from filters import filter_by_date, filter_by_types, filter_by_states
-from map_visualization import create_base_figure, update_figure_data, map
+from map_visualization import *
 from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
 
 st.set_page_config(layout="wide")
@@ -139,13 +139,47 @@ def main():
     
     # example containers
     container1, container2 = st.columns(2)
-    with container1:
-        st.subheader("Container 1")
-        st.write("This is the first container.")
 
+    # Container 1: Display selected filters
+    with container1:
+        st.subheader("Selected Filters")
+        
+        # Display selected date range
+        st.write(f"**Date Range:** {start_date} to {end_date}")
+        
+        # Display selected incident types
+        selected_incident_types = [
+            description for description, selected in selected_types.items() if selected
+        ]
+        st.write(f"**Incident Types:** {', '.join(selected_incident_types) if selected_incident_types else 'None selected'}")
+        
+        # Display selected states
+        selected_state_names = [
+            state for state, selected in selected_states.items() if selected
+        ]
+        st.write(f"**States:** {', '.join(selected_state_names) if selected_state_names else 'None selected'}")
+
+    # Container 2: Display the map/graph
     with container2:
-        st.subheader("Container 2")
-        st.write("This is the second container.")
+        st.subheader("Filtered Data Map/Graph")
+            
+        # Apply the selected filter to the data
+        filtered_data = st.session_state.map_data[selected_filter]
+        
+        # Create the plot for the filtered data
+        if not filtered_data.empty:
+            fig = px.scatter(
+                filtered_data, 
+                x='Longitude', 
+                y='Latitude', 
+                color='STATE', 
+                hover_data=['DATETIME']
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.write("No data available for the selected filters.")
+
+
 
 
 if __name__ == "__main__":
