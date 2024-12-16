@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import json
-from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS
+from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH
 
 DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
 STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
@@ -31,7 +31,15 @@ def create_base_figure():
     )
     return fig
 
+def initialize_data():
+    if 'map_data' not in st.session_state:
+        data = pd.read_csv(DATA_PATH, low_memory=False)
+        data['DATETIME'] = pd.to_datetime(data['DATETIME'])
+        st.session_state.map_data = data
 
+def initialize_figure():
+    if 'fig' not in st.session_state:
+        st.session_state.fig = create_base_figure()
 
 def map(fig, data, selected_filter):
     selected_markers = st.plotly_chart(
