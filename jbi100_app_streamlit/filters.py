@@ -55,7 +55,7 @@ def setup_filters(map_data):
     )
 
     if start_date > end_date:
-        return "Start date cannot be after end date."  # Return an error message
+        return "Start date cannot be after end date." # Error message
 
     # Incident Type filters
     with st.sidebar.expander("Incident Types", expanded=False):

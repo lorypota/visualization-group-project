@@ -2,10 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import json
-from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH
-
-DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
-STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
+from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, STYLE
 
 selected_data = None
 unselected_data = None

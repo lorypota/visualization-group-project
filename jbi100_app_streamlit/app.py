@@ -12,7 +12,7 @@ def main():
     map_data = st.session_state.map_data
     selected_filter = setup_filters(map_data)
 
-    if isinstance(selected_filter, str):  # Check if an error message is returned
+    if isinstance(selected_filter, str):
         st.error(selected_filter)
     else:
         # Update the figure data

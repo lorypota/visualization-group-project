@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
+# Mapbox styles
+DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
+STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
+
 # File paths
 DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
 
@@ -19,7 +23,6 @@ MAP_CONFIGS = {
         "lon": [-150.0, -40]    # Min and max longitudes
     }
 }
-
 
 # State codes
 STATE_CODES = {
