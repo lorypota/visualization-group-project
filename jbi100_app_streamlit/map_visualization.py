@@ -53,7 +53,7 @@ def map(fig, data, selected_filter):
         on_select="rerun",
     )
     selected_markers = json.dumps(selected_markers)
-    
+
     if selected_markers:
         # Extract latitudes and longitudes from selected_markers
         selection = json.loads(selected_markers)['selection']
@@ -61,7 +61,7 @@ def map(fig, data, selected_filter):
             (point['lat'], point['lon'])
             for point in selection['points']
         }
-        
+
         global selected_data
         global unselected_data
 
@@ -82,7 +82,7 @@ def marker_properties_selected():
     return dict(size=6, opacity=0.8, color='red')
 
 def marker_properties_unselected():
-    return dict(size=5, opacity=0.4, color='#FFCCCB')
+    return dict(size=6, opacity=0.5, color='#FFCCCB')
 
 def update_figure_data(fig, data, selected_filter, selected_markers=None):
     # Separate selected and unselected data
@@ -95,50 +95,31 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
     selected_data['hover_label'] = 'Selected'
     unselected_data['hover_label'] = 'Unselected'
 
-    # Update the traces directly; ensure the selector name matches the trace name
-    try:
-        fig.update_traces(
-            lat=selected_data["Latitude"].tolist(),
-            lon=selected_data["Longitude"].tolist(),
-            hovertext=(selected_data["DATETIME"].astype(
-                str) + " - " + selected_data["hover_label"]).tolist(),
-            marker=marker_properties_selected(),
-            selector=dict(name="Selected"),
-        )
-    except Exception as e:
-        print("Error updating 'Selected' trace:", e)
+    # Remove existing traces
+    fig.data = []
 
-    try:
-        fig.update_traces(
-            lat=unselected_data["Latitude"].tolist(),
-            lon=unselected_data["Longitude"].tolist(),
-            hovertext=(unselected_data["DATETIME"].astype(
-                str) + " - " + unselected_data["hover_label"]).tolist(),
-            marker=marker_properties_unselected(),
-            selector=dict(name="Unselected"),
-        )
-    except Exception as e:
-        print("Error updating 'Unselected' trace:", e)
+    # Add the unselected trace first
+    fig.add_scattermapbox(
+        lat=unselected_data["Latitude"].tolist(),
+        lon=unselected_data["Longitude"].tolist(),
+        hovertext=(unselected_data["DATETIME"].astype(
+            str) + " - " + unselected_data["hover_label"]).tolist(),
+        mode='markers',
+        marker=marker_properties_unselected(),
+        selected=dict(marker=marker_properties_unselected()),
+        unselected=dict(marker=marker_properties_unselected()),
+        name="Unselected",
+    )
 
-    # If traces for "Selected" and "Unselected" do not exist, add them
-    existing_trace_names = [trace.name for trace in fig.data]
-    if "Selected" not in existing_trace_names:
-        fig.add_scattermapbox(
-            lat=selected_data["Latitude"].tolist(),
-            lon=selected_data["Longitude"].tolist(),
-            hovertext=(selected_data["DATETIME"].astype(
-                str) + " - " + selected_data["hover_label"]).tolist(),
-            mode='markers',
-            marker=marker_properties_selected(),
-            name="Selected",
-        )
-    if "Unselected" not in existing_trace_names:
-        fig.add_scattermapbox(
-            lat=unselected_data["Latitude"].tolist(),
-            lon=unselected_data["Longitude"].tolist(),
-            hovertext=(unselected_data["DATETIME"].astype(
-                str) + " - " + unselected_data["hover_label"]).tolist(),
-            mode='markers',
-            marker=marker_properties_unselected(),
-            name="Unselected",
-        )
+    # Add the selected trace second
+    fig.add_scattermapbox(
+        lat=selected_data["Latitude"].tolist(),
+        lon=selected_data["Longitude"].tolist(),
+        hovertext=(selected_data["DATETIME"].astype(
+            str) + " - " + selected_data["hover_label"]).tolist(),
+        mode='markers',
+        marker=marker_properties_selected(),
+        selected=dict(marker=marker_properties_selected()),
+        unselected=dict(marker=marker_properties_unselected()),
+        name="Selected",
+    )

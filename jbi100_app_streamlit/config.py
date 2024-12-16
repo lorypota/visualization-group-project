@@ -7,7 +7,7 @@ MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
 
 # Mapbox styles
 DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
-STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu"
+STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu" # currently not used
 
 # File paths
 DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
