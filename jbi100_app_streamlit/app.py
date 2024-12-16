@@ -13,7 +13,7 @@ st.markdown(
             overflow: hidden; /* Prevent unwanted scrolling */
         }
         [data-testid="stSidebar"][aria-expanded="true"] {
-            min-width: 330px;
+            min-width: 350px;
         }
         header {visibility: hidden;}
         footer {visibility: hidden;}
@@ -130,12 +130,10 @@ def main():
     )
 
     # Update the figure data
-    update_figure_data(st.session_state.fig,
-                       st.session_state.map_data, selected_filter)
+    update_figure_data(st.session_state.fig, st.session_state.map_data, selected_filter)
 
     # Display the figure
-    map(st.session_state.fig,
-        st.session_state.map_data, selected_filter)
+    map(st.session_state.fig, st.session_state.map_data, selected_filter)
     
     # example containers
     container1, container2 = st.columns(2)
