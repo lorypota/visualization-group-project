@@ -80,18 +80,12 @@ def map(fig, data, selected_filter):
         # Add hover labels without mutating the original DataFrame
         selected_data['hover_label'] = 'Selected'
         unselected_data['hover_label'] = 'Unselected'
-        
-
-
-
 
 def marker_properties_selected():
     return dict(size=6, opacity=0.8, color='red')
 
-
 def marker_properties_unselected():
     return dict(size=5, opacity=0.4, color='#FFCCCB')
-
 
 def update_figure_data(fig, data, selected_filter, selected_markers=None):
     # Separate selected and unselected data

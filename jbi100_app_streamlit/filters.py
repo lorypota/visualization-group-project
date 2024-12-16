@@ -54,6 +54,9 @@ def setup_filters(map_data):
         max_value=map_data['DATETIME'].max().date()
     )
 
+    if start_date > end_date:
+        return "Start date cannot be after end date."  # Return an error message
+
     # Incident Type filters
     with st.sidebar.expander("Incident Types", expanded=False):
         cols = st.columns(2)

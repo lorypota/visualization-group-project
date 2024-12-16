@@ -12,11 +12,14 @@ def main():
     map_data = st.session_state.map_data
     selected_filter = setup_filters(map_data)
 
-    # Update the figure data
-    update_figure_data(st.session_state.fig, map_data, selected_filter)
+    if isinstance(selected_filter, str):  # Check if an error message is returned
+        st.error(selected_filter)
+    else:
+        # Update the figure data
+        update_figure_data(st.session_state.fig, map_data, selected_filter)
 
-    # Display the figure
-    map(st.session_state.fig, map_data, selected_filter)
+        # Display the figure
+        map(st.session_state.fig, map_data, selected_filter)
     
     # example containers
     container1, container2 = st.columns(2)
