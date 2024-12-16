@@ -142,3 +142,4 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
             marker=marker_properties_unselected(),
             name="Unselected",
         )
+    
