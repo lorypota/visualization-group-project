@@ -11,6 +11,7 @@ from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
 st.set_page_config(layout="wide")
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 
+
 def main():
     initialize_data()
     initialize_figure()
@@ -20,34 +21,46 @@ def main():
     if isinstance(selected_filter, str):
         st.error(selected_filter)
     else:
-        # Update the figure data
+        # Update the figure data for the map
         update_figure_data(st.session_state.fig, map_data, selected_filter)
 
-        # Display the figure
+        # Display the map visualization
         map(st.session_state.fig, map_data, selected_filter)
-    
-    # example containers
-    container1, container2 = st.columns(2)
-    with container1:
-        st.subheader("Container 1")
-        st.write("This is the first container.")
-        # Dropdown menu for plot selection
-        plot_choice = st.selectbox(
-            "Select a Plot Type",
-            ["Bar Graph", "Scatter Plot", "Time Series Plot"]
-        )
 
-    with container2:
-        st.subheader("Container 2")
-        st.write("This is the second container.")
+    # Define containers
+    controls_container, output_container = st.columns(2)
 
-        # Display the selected plot
-        if plot_choice == "Bar Graph":
-            plot_bar_graph(st.session_state.map_data[selected_filter])
-        elif plot_choice == "Scatter Plot":
-            plot_scatter_plot(st.session_state.map_data[selected_filter])
-        elif plot_choice == "Time Series Plot":
-            plot_timeseries(st.session_state.map_data[selected_filter])
+    with controls_container:
+        st.subheader("Controls")
+        st.write("Select the type of plot to display:")
+
+        # Initialize session state for plot choice
+        if "plot_choice" not in st.session_state:
+            st.session_state.plot_choice = "Bar Graph"
+
+        # Custom button-like options for plot selection
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📊 Bar Graph"):
+                st.session_state.plot_choice = "Bar Graph"
+        with col2:
+            if st.button("🔵 Scatter Plot"):
+                st.session_state.plot_choice = "Scatter Plot"
+        with col3:
+            if st.button("📈 Time Series"):
+                st.session_state.plot_choice = "Time Series"
+
+    with output_container:
+        st.subheader("Visualization")
+        st.write("This is the output container where the selected plot is displayed.")
+
+        # Display the selected plot based on session state
+        if st.session_state.plot_choice == "Bar Graph":
+            plot_bar_graph(map_data[selected_filter])
+        elif st.session_state.plot_choice == "Scatter Plot":
+            plot_scatter_plot(map_data[selected_filter])
+        elif st.session_state.plot_choice == "Time Series":
+            plot_timeseries(map_data[selected_filter])
 
 
 if __name__ == "__main__":
