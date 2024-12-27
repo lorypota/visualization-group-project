@@ -51,3 +51,26 @@ TYPE_DESCRIPTIONS = {
     '12': 'Other impacts',
     '13': 'Other'
 }
+
+VIS_DESCRIPTIONS = {
+    '1': 'Dawn',
+    '2': 'Day',
+    '3': 'Dusk',
+    '4': 'Dark'
+}
+
+WEATHER_DESCRIPTIONS = {
+    '1': 'Clear',
+    '2': 'Cloudy',
+    '3': 'Rain',
+    '4': 'Fog',
+    '5': 'Sleet',
+    '6': 'Snow'
+}
+
+TRACK_DESCRIPTIONS = {
+    '1': 'Main',
+    '2': 'Yard',
+    '3': 'Siding',
+    '4': 'Industry',
+}

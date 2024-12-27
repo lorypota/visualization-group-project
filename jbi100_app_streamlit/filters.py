@@ -1,6 +1,17 @@
 import pandas as pd
-from config import STATE_CODES, TYPE_DESCRIPTIONS
+from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS
 import streamlit as st
+import matplotlib.pyplot as plt
+
+DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
+data = pd.read_csv(DATA_PATH, low_memory=False)
+
+data['TOTINJ'].hist(bins=30)
+plt.title('Histogram of TOTINJ')
+plt.xlabel('TOTINJ')
+plt.ylabel('Frequency')
+plt.show()
+
 
 
 def filter_by_date(data, start_date, end_date):
@@ -10,6 +21,11 @@ def filter_by_date(data, start_date, end_date):
         (data['DATETIME'] <= pd.to_datetime(end_date))
     ]
 
+def filter_by_temperature(data, start_temp, end_temp):
+    """Filter map data based on selected temperature range"""
+    return data[
+        (data['TEMP'] >= start_temp & data['TEMP'] <= end_temp)
+    ]
 
 def filter_by_states(data, selected_states):
     """Filter map data based on selected states."""
@@ -24,6 +40,20 @@ def filter_by_types(data, selected_types):
     selected_type_codes = [int(code) for code, description in TYPE_DESCRIPTIONS.items()
                            if selected_types.get(description, False)]
     return data[data['TYPE'].isin(selected_type_codes)]
+
+
+def filter_by_visibility(data, selected_vis):
+    """Filter map data based on selected visibility categories"""
+    selected_vis_codes =[int(code) for code, description in VIS_DESCRIPTIONS.items()
+                         if selected_vis.get(description, False)]
+    return data[data['VISIBLTY'].isin(selected_vis_codes)]
+
+def filter_by_weather(data, selected_weather):
+    """Filter map data based on selected weather categories"""
+    selected_weather_codes = [int(code) for code, description in WEATHER_DESCRIPTIONS.items()
+                              if selected_weather.get(description, False)]
+    return data[data['WEATHER'].isin(selected_weather_codes)]
+
 
 
 def filter_by_region(data, region):
@@ -56,7 +86,27 @@ def setup_filters(map_data):
 
     if start_date > end_date:
         return "Start date cannot be after end date." # Error message
-
+    
+    # Temperature Slider
+    min_temp = map_data['TEMP'].min()
+    max_temp = map_data['TEMP'].max()
+    temp_range = st.sidebar.slider(
+            "Temperature Range (F)",
+            min_value=float(min_temp),
+            max_value=float(max_temp),
+            value=(float(min_temp), float(max_temp))
+        )
+    
+    # Speed Slider
+    min_speed = map_data['TRNSPD'].min()
+    max_speed = map_data['TRNSPD'].max()
+    speed_range = st.sidebar.slider(
+            "Speed Range (mph)",
+            min_value=float(min_speed),
+            max_value=float(max_speed),
+            value=(float(min_speed), float(max_speed))
+        )
+    
     # Incident Type filters
     with st.sidebar.expander("Incident Types", expanded=False):
         cols = st.columns(2)
@@ -80,6 +130,80 @@ def setup_filters(map_data):
             selected_types[description] = cols[col_index].checkbox(
                 description, value=st.session_state[key], key=key
             )
+
+
+    # Visibility filters
+    with st.sidebar.expander("Visibility", expanded=False):
+        cols = st.columns(2)
+        vis_per_col = -(-len(VIS_DESCRIPTIONS) // 2)
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_vis"):
+            for code in VIS_DESCRIPTIONS.keys():
+                st.session_state[f"vis_{code}"] = True
+        if col2.button("Deselect All", key="deselect_all_vis"):
+            for code in VIS_DESCRIPTIONS.keys():
+                st.session_state[f"vis_{code}"] = False
+
+        selected_vis = {}
+        for i, (code, description) in enumerate(VIS_DESCRIPTIONS.items()):
+            col_index = i // vis_per_col
+            key = f"vis_{code}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_vis[description] = cols[col_index].checkbox(
+                description, value=st.session_state[key], key=key
+            )
+
+    # Weather filters
+    with st.sidebar.expander("Weather", expanded=False):
+        cols = st.columns(2)
+        weather_per_col = -(-len(WEATHER_DESCRIPTIONS) // 2)
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_weather"):
+            for code in WEATHER_DESCRIPTIONS.keys():
+                st.session_state[f"weather_{code}"] = True
+        if col2.button("Deselect All", key="deselect_all_weather"):
+            for code in WEATHER_DESCRIPTIONS.keys():
+                st.session_state[f"weather_{code}"] = False
+
+        selected_weather = {}
+        for i, (code, description) in enumerate(WEATHER_DESCRIPTIONS.items()):
+            col_index = i // weather_per_col
+            key = f"weather_{code}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_weather[description] = cols[col_index].checkbox(
+                description, value=st.session_state[key], key=key
+            )
+
+     # Track type filters
+    with st.sidebar.expander("Track Type", expanded=False):
+        cols = st.columns(2)
+        track_per_col = -(-len(TRACK_DESCRIPTIONS) // 2)
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_track"):
+            for code in TRACK_DESCRIPTIONS.keys():
+                st.session_state[f"track_{code}"] = True
+        if col2.button("Deselect All", key="deselect_all_track"):
+            for code in TRACK_DESCRIPTIONS.keys():
+                st.session_state[f"track_{code}"] = False
+
+        selected_track = {}
+        for i, (code, description) in enumerate(TRACK_DESCRIPTIONS.items()):
+            col_index = i // track_per_col
+            key = f"track_{code}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_track[description] = cols[col_index].checkbox(
+                description, value=st.session_state[key], key=key
+            )
+
 
     # State filters
     with st.sidebar.expander("States", expanded=False):
@@ -110,9 +234,25 @@ def setup_filters(map_data):
     selected_filter = (
         (map_data['DATETIME'] >= pd.to_datetime(start_date)) &
         (map_data['DATETIME'] <= pd.to_datetime(end_date)) &
+        (map_data['TEMP']>= temp_range[0]) & 
+        (map_data['TEMP'] <= temp_range[1]) &
+        (map_data['TRNSPD'] >= speed_range[0]) &
+        (map_data['TRNSPD'] <= speed_range[1]) &
         (map_data['TYPE'].isin(
             [int(code) for code, description in TYPE_DESCRIPTIONS.items()
              if selected_types.get(description, False)]
+        )) &
+        (map_data['VISIBLTY'].isin(
+            [int(code) for code, description in VIS_DESCRIPTIONS.items()
+             if selected_vis.get(description, False)]
+        )) &
+        (map_data['WEATHER'].isin(
+            [int(code) for code, description in WEATHER_DESCRIPTIONS.items()
+             if selected_weather.get(description, False)]
+        )) &
+        (map_data['TYPTRK'].isin(
+            [int(code) for code, description in TRACK_DESCRIPTIONS.items()
+             if selected_track.get(description, False)]
         )) &
         (map_data['STATE'].isin(
             [reverse_state_codes[state]
