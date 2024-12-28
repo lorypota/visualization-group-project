@@ -202,23 +202,6 @@ if DROP_0_COORD:
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
 
-import matplotlib.pyplot as plt
-
-DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
-data = pd.read_csv(DATA_PATH, low_memory=False)
-
-injury_counts = data['TOTINJ'].value_counts()
-fatality_counts = data['TOTKLD'].value_counts()
-damage_counts = data['ACCDMG'].value_counts()
-
-print("Counts for TOTINJ:")
-print(injury_counts)
-
-print("\nCounts for TOTKLD:")
-print(fatality_counts)
-
-print("\nCounts for ACCDMG:")
-print(damage_counts)
 
 
 

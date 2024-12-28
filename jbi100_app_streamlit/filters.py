@@ -1,17 +1,6 @@
 import pandas as pd
 from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS
 import streamlit as st
-import matplotlib.pyplot as plt
-
-DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
-data = pd.read_csv(DATA_PATH, low_memory=False)
-
-data['TOTINJ'].hist(bins=30)
-plt.title('Histogram of TOTINJ')
-plt.xlabel('TOTINJ')
-plt.ylabel('Frequency')
-plt.show()
-
 
 
 def filter_by_date(data, start_date, end_date):
