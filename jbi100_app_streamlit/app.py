@@ -2,11 +2,7 @@ import streamlit as st
 from filters import setup_filters
 from map_visualization import update_figure_data, map, initialize_data, initialize_figure
 from styles import CSS_STYLE
-import pandas as pd
-from plots import *
-from filters import filter_by_date, filter_by_types, filter_by_states
-from map_visualization import create_base_figure, update_figure_data, map
-from config import STATE_CODES, TYPE_DESCRIPTIONS, DATA_PATH
+from config import VARIABLES, PLOT_FUNCTIONS
 
 st.set_page_config(layout="wide")
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
@@ -26,42 +22,48 @@ def main():
 
         # Display the map visualization
         map(st.session_state.fig, map_data, selected_filter)
+    
 
-    # Define containers
-    controls_container, output_container = st.columns(2)
+    # example containers
+    container1, container2 = st.columns(2)
 
-    with controls_container:
+    
+    with container1:
         st.subheader("Controls")
-        st.write("Select the type of plot to display:")
-
-        # Initialize session state for plot choice
-        if "plot_choice" not in st.session_state:
-            st.session_state.plot_choice = "Bar Graph"
-
-        # Custom button-like options for plot selection
-        col1, col2, col3 = st.columns(3)
+        st.write("Select the variables you want to analyze.") 
+        col1, col2 = st.columns(2)
         with col1:
-            if st.button("📊 Bar Graph"):
-                st.session_state.plot_choice = "Bar Graph"
+            st.write("First variable of Interest:")
+            selected_variable = None
+            selected_variable = st.radio( "Choose one variable", 
+                                         options=list(VARIABLES.keys()), 
+                                         key="first_variable"
+                                                 )
         with col2:
-            if st.button("🔵 Scatter Plot"):
-                st.session_state.plot_choice = "Scatter Plot"
-        with col3:
-            if st.button("📈 Time Series"):
-                st.session_state.plot_choice = "Time Series"
+            if selected_variable:
+                second_selected_var = "Number of Accidents" #default
+                st.write(f"Choose a second Variable of Interest to:{selected_variable}:")
+                # Use a radio button for single selection
+                options = VARIABLES[selected_variable]
+                second_selected_var = st.radio("Choose one variable",
+                                               options=options,
+                                               key=f"radio_{selected_variable}"
+                                                                               )
+  
 
-    with output_container:
+    with container2:
         st.subheader("Visualization")
-        st.write("This is the output container where the selected plot is displayed.")
-
-        # Display the selected plot based on session state
-        if st.session_state.plot_choice == "Bar Graph":
-            plot_bar_graph(map_data[selected_filter])
-        elif st.session_state.plot_choice == "Scatter Plot":
-            plot_scatter_plot(map_data[selected_filter])
-        elif st.session_state.plot_choice == "Time Series":
-            plot_timeseries(map_data[selected_filter])
-
+        st.write("This is the corresponding visualization.")
+        if selected_variable and second_selected_var:
+            key = (selected_variable, second_selected_var)
+            print(key)
+            if key in PLOT_FUNCTIONS:
+                # Generate and display the corresponding plot
+                plot_func = PLOT_FUNCTIONS[key]
+                fig = plot_func(map_data[selected_filter], selected_variable, second_selected_var)
+                st.pyplot(fig)
+            else:
+                st.write("No predefined plot available for this selection.")
 
 if __name__ == "__main__":
     main()

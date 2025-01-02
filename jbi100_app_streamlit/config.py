@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import matplotlib.pyplot as plt
 
 # Load environment variables
 load_dotenv()
@@ -50,4 +51,116 @@ TYPE_DESCRIPTIONS = {
     '11': 'Fire/violent rupture',
     '12': 'Other impacts',
     '13': 'Other'
+}
+
+VIS_DESCRIPTIONS = {
+    '1': 'Dawn',
+    '2': 'Day',
+    '3': 'Dusk',
+    '4': 'Dark'
+}
+
+WEATHER_DESCRIPTIONS = {
+    '1': 'Clear',
+    '2': 'Cloudy',
+    '3': 'Rain',
+    '4': 'Fog',
+    '5': 'Sleet',
+    '6': 'Snow'
+}
+
+TRACK_DESCRIPTIONS = {
+    '1': 'Main',
+    '2': 'Yard',
+    '3': 'Siding',
+    '4': 'Industry',
+}
+
+VARIABLES = {
+    "Incident Type": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
+    "Weather": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
+    "Visibility": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
+    "Track Type": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
+    "Year": ["Number of Accidents", "Incident Type", "Speed", "Temperature", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
+    "Temperature": ["Number of Accidents", "Incident Type", "Speed", "Year", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
+    "Speed": ["Number of Accidents", "Incident Type", "Speed", "Year", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
+    
+}
+
+VARNAMES_TO_DATASET = {
+    "Number of Accidents": "Number of Accidents" ,
+    "Weather": "WEATHER",
+    "Visibility": "VISIBLTY",
+    "Track Type": "TYPTRK",
+    "Year": "YEAR",
+    "Speed" : "TRNSPD",
+    "Temperature" : "TEMP",
+    "State": "STATE",
+    "Incident Type": "TYPE",
+    "Total Damage Costs": "ACCDMG"
+}
+
+
+def plot_bar_chart(data, categorical_var, numerical_var):
+
+    fig, ax = plt.subplots()
+    cat_var_data = VARNAMES_TO_DATASET[categorical_var]
+    num_var_data = VARNAMES_TO_DATASET[numerical_var]
+    if num_var_data == "Number of Accidents":
+        grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
+    else:
+        grouped_data = data.groupby(cat_var_data)[num_var_data].mean()
+    grouped_data.plot(kind='bar', ax=ax)
+    ax.set_title(f"{categorical_var} vs {numerical_var}")
+    ax.set_xlabel(categorical_var)
+    ax.set_ylabel(numerical_var)
+    return fig
+
+
+def plot_line_chart(data, x_var, y_var):
+
+    x_var_data = VARNAMES_TO_DATASET[x_var]
+    y_var_data = VARNAMES_TO_DATASET[y_var]
+    fig, ax = plt.subplots()
+    if y_var_data == "Number of Accidents":
+       grouped_data = data.groupby(x_var_data).size().reset_index(name='Counts')
+    else:
+       grouped_data = data.groupby(x_var_data)[y_var_data].mean()
+    grouped_data.plot(kind='line', ax=ax)
+    ax.set_title(f"{x_var} vs {x_var}")
+    ax.set_xlabel(x_var)
+    ax.set_ylabel(y_var)
+    return fig
+
+def plot_scatter(data, x_var, y_var):
+    x_var_data = VARNAMES_TO_DATASET[x_var]
+    y_var_data = VARNAMES_TO_DATASET[y_var]
+
+    fig, ax = plt.subplots()
+    ax.scatter(data[x_var_data], data[y_var_data], alpha=0.7)
+    ax.set_title(f"{x_var} vs {y_var}")
+    ax.set_xlabel(x_var)
+    ax.set_ylabel(y_var)
+    return fig
+
+
+PLOT_FUNCTIONS = { ("Weather", "Number of Accidents"): plot_bar_chart, 
+                  ("Visibility", "Number of Accidents"): plot_bar_chart,
+                  ("Track Type", "Number of Accidents"): plot_bar_chart,
+                  ("Incident Type", "Number of Accidents"): plot_bar_chart,
+                  ("Year", "Number of Accidents"): plot_line_chart,
+                  ("Speed", "Number of Accidents"): plot_line_chart,
+                  ("Temperature", "Number of Accidents"): plot_line_chart,
+                  ("Year", "Speed"): plot_scatter,
+                  ("Year", "Total Damage Costs") : plot_scatter,
+                  ("Speed", "Total Damage Costs") : plot_scatter,
+                  ("Track Type", "Speed"): plot_bar_chart,
+                  ("Visibility", "Speed"): plot_bar_chart,
+                  ("Weather", "Speed"): plot_bar_chart,
+                  ("Incident Type", "Speed"): plot_bar_chart,
+                  ("Track Type", "Total Damage Costs"): plot_bar_chart,
+                  ("Visibility", "Total Damage Costs" ): plot_bar_chart,
+                  ("Weather", "Total Damage Costs"): plot_bar_chart,
+                  ("Incident Type", "Total Damage Costs"): plot_bar_chart
+
 }

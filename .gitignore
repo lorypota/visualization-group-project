@@ -218,3 +218,10 @@ pyvenv.cfg
 pip-selfcheck.json
 Notebooks/Railroad Incidents/Railroad_Equipment_Accident_Incident_Source_Data__Form_54__20241026.csv
 Railroad Incidents/Railroad_Equipment_Accident_Incident_Source_Data__Form_54__20241026.csv
+jbi100_app_dash/Railroad_Incidents/CleanedDataset.csv
+jbi100_app_dash/Railroad_Incidents/dataset.csv
+jbi100_app_dash/Railroad_Incidents/readme.txt
+jbi100_app_dash/clean_dataset.py
+jbi100_app_dash/clean_dataset.py
+jbi100_app_dash/clean_dataset.py
+jbi100_app_streamlit/hanna_tests

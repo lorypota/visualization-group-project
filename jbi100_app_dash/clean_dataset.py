@@ -201,3 +201,7 @@ if DROP_0_COORD:
     
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
+
+
+
+
