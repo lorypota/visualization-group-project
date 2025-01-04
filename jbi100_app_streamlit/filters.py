@@ -1,5 +1,5 @@
 import pandas as pd
-from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS
+from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS, KILL_BUCKETS, INJURED_BUCKETS, COSTS_BUCKETS
 import streamlit as st
 
 
@@ -144,6 +144,83 @@ def setup_filters(map_data):
             selected_vis[description] = cols[col_index].checkbox(
                 description, value=st.session_state[key], key=key
             )
+    
+    # TOT KILLED buckets
+    with st.sidebar.expander("Total People Killed", expanded=False):
+        cols = st.columns(2)
+        kill_per_col = -(-len(KILL_BUCKETS) // 2)  # Divide into two columns
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_killed"):
+            for bucket in KILL_BUCKETS.keys():
+                st.session_state[f"kill_{bucket}"] = True
+        if col2.button("Deselect All", key="deselect_all_killed"):
+            for bucket in KILL_BUCKETS.keys():
+                st.session_state[f"kill_{bucket}"] = False
+
+        # Render checkboxes for each bucket
+        selected_killed = {}
+        for i, bucket in enumerate(KILL_BUCKETS.keys()):  # Use bucket keys for labels
+            col_index = i // kill_per_col  # Determine column index
+            key = f"kill_{bucket}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_killed[bucket] = cols[col_index].checkbox(
+                f"{bucket}", value=st.session_state[key], key=key
+            )
+
+    # TOT INJURED buckets
+    with st.sidebar.expander("Total People Injured", expanded=False):
+        cols = st.columns(2)
+        injured_per_col = -(-len(INJURED_BUCKETS) // 2)  # Divide into two columns
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_injured"):
+            for bucket in INJURED_BUCKETS.keys():
+                st.session_state[f"injured_{bucket}"] = True
+        if col2.button("Deselect All", key="deselect_all_injured"):
+            for bucket in INJURED_BUCKETS.keys():
+                st.session_state[f"injured_{bucket}"] = False
+
+        # Render checkboxes for each bucket
+        selected_injured = {}
+        for i, bucket in enumerate(INJURED_BUCKETS.keys()):  # Use bucket keys for labels
+            col_index = i // injured_per_col  # Determine column index
+            key = f"injured_{bucket}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_injured[bucket] = cols[col_index].checkbox(
+                f"{bucket}", value=st.session_state[key], key=key
+            )
+
+
+    # TOT COSTS buckets
+    with st.sidebar.expander("Damage Costs", expanded=False):
+        cols = st.columns(2)
+        costs_per_col = -(-len(COSTS_BUCKETS) // 2)  # Divide into two columns
+
+        # Select All/Deselect All buttons
+        col1, col2 = st.columns([1, 1])
+        if col1.button("Select All", key="select_all_costs"):
+            for bucket in COSTS_BUCKETS.keys():
+                st.session_state[f"costs_{bucket}"] = True
+        if col2.button("Deselect All", key="deselect_all_costs"):
+            for bucket in COSTS_BUCKETS.keys():
+                st.session_state[f"costs_{bucket}"] = False
+
+        # Render checkboxes for each bucket
+        selected_costs = {}
+        for i, bucket in enumerate(COSTS_BUCKETS.keys()):  # Use bucket keys for labels
+            col_index = i // costs_per_col  # Determine column index
+            key = f"costs_{bucket}"
+            if key not in st.session_state:
+                st.session_state[key] = True  # Default to selected
+            selected_costs[bucket] = cols[col_index].checkbox(
+                f"{bucket}", value=st.session_state[key], key=key
+            )
+
 
     # Weather filters
     with st.sidebar.expander("Weather", expanded=False):
@@ -246,7 +323,26 @@ def setup_filters(map_data):
         (map_data['STATE'].isin(
             [reverse_state_codes[state]
                 for state, selected in selected_states.items() if selected]
+        )) &
+        (map_data['TOTKLD'].apply(
+            lambda x: any(
+                condition(x) for bucket, condition in KILL_BUCKETS.items()
+                if selected_killed.get(bucket, False)
+            )
+        )) &
+        (map_data['TOTINJ'].apply(
+            lambda x: any(
+                condition(x) for bucket, condition in INJURED_BUCKETS.items()
+                if selected_injured.get(bucket, False)
+            )
+        ))&
+        (map_data['ACCDMG'].apply(
+            lambda x: any(
+                condition(x) for bucket, condition in COSTS_BUCKETS.items()
+                if selected_costs.get(bucket, False)
+            )
         ))
+        
     )
 
     return selected_filter

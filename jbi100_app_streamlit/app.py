@@ -53,16 +53,17 @@ def main():
     with container2:
         st.subheader("Visualization")
         st.write("This is the corresponding visualization.")
-        if selected_variable and second_selected_var:
-            key = (selected_variable, second_selected_var)
-            print(key)
-            if key in PLOT_FUNCTIONS:
-                # Generate and display the corresponding plot
-                plot_func = PLOT_FUNCTIONS[key]
-                fig = plot_func(map_data[selected_filter], selected_variable, second_selected_var)
-                st.pyplot(fig)
-            else:
-                st.write("No predefined plot available for this selection.")
-
+        if not map_data[selected_filter].empty:
+            if selected_variable and second_selected_var:
+                key = (selected_variable, second_selected_var)
+                if key in PLOT_FUNCTIONS:
+                    # Generate and display the corresponding plot
+                    plot_func = PLOT_FUNCTIONS[key]
+                    fig = plot_func(map_data[selected_filter], selected_variable, second_selected_var)
+                    st.pyplot(fig)
+                else:
+                    st.write("No predefined plot available for this selection.")
+        else:
+            st.write("You haven't selected any accidents, please check your filters")
 if __name__ == "__main__":
     main()

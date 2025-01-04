@@ -76,6 +76,37 @@ TRACK_DESCRIPTIONS = {
     '4': 'Industry',
 }
 
+KILL_BUCKETS = {
+    "0": lambda x: x == 0,
+    "1": lambda x: x == 1,
+    "2": lambda x: x == 2,
+    "3+": lambda x: x >= 3,
+}
+
+INJURED_BUCKETS = {
+    "0": lambda x: x == 0,
+    "1-5": lambda x: (x > 0) & (x < 6),
+    "6-10": lambda x: (x > 5) & (x < 11),
+    "11-20": lambda x: (x > 10) & (x < 21),
+    "21-50": lambda x: (x > 20) & (x < 51),
+    "51-75": lambda x: (x > 50) & (x < 76),
+    "76-99": lambda x: (x > 75) & (x < 100),
+    "100+": lambda x: x > 99
+}
+
+COSTS_BUCKETS = {
+    "0": lambda x: x == 0,
+    "0-0.25 million": lambda x: (x > 0) & (x <= 250000),
+    "0.25-0.5 million": lambda x: (x > 250000) & (x <= 500000),
+    "0.5 - 1 million": lambda x: (x > 500000) & (x <= 1000000),
+    "1 million - 2 million": lambda x: (x > 1000000) & (x <= 2000000),
+    "2 million - 5 million": lambda x: (x > 2000000) & (x <= 5000000),
+    "5 million - 10 million": lambda x: (x > 5000000) & (x <= 10000000),
+    "10 million - 20 million": lambda x: (x > 10000000) & (x <= 20000000),
+    "20+ million": lambda x: x > 20000000
+}
+
+
 VARIABLES = {
     "Incident Type": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
     "Weather": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
