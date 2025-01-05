@@ -123,3 +123,68 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
         unselected=dict(marker=marker_properties_unselected()),
         name="Selected",
     )
+
+
+
+def check_single_event():
+    global selected_data
+    
+    # Debugging: Print the length and columns of the selected data
+    print('This is the length of selected data:', len(selected_data))
+    
+    # Check if only one event is selected
+    if len(selected_data) == 1:
+        st.subheader("Meta-Information for Selected Accident")
+        
+        # Extract the single row of data
+        accident_data = selected_data.iloc[0]
+      
+        # Display meta-information in a structured format
+        col1, col2 = st.columns(2)
+        
+        # Location Information
+        with col1:
+            st.subheader("Location Information")
+            st.write(f"**State:** {accident_data['STATE']}")
+            st.write(f"**County:** {accident_data['COUNTY']}")
+            st.write(f"**Latitude:** {accident_data['Latitude']}")
+            st.write(f"**Longitude:** {accident_data['Longitude']}")
+            st.write(f"**Milepost:** {accident_data['MILEPOST']}")
+        
+        # Timing Information
+        with col2:
+            st.subheader("Timing Information")
+            st.write(f"**Year:** {accident_data['YEAR']}")
+            st.write(f"**Month:** {accident_data['MONTH']}")
+            st.write(f"**Day:** {accident_data['DAY']}")
+            st.write(f"**Time:** {accident_data['TIMEHR']}:{accident_data['TIMEMIN']} {accident_data['AMPM']}")
+        
+        # Expanders for additional information
+        with st.expander("Damage Details"):
+            st.write(f"**Cars Damaged:** {accident_data['CARSDMG']}")
+            st.write(f"**Track Damage:** {accident_data['TRKDMG']}")
+            st.write(f"**Total Damage:** {accident_data['ACCDMG']}")
+            st.write(f"**Equipment Damage:** {accident_data['EQPDMG']}")
+        
+        with st.expander("Casualties"):
+            st.write(f"**Total Injuries:** {accident_data['TOTINJ']}")
+            st.write(f"**Total Killed:** {accident_data['TOTKLD']}")
+            st.write(f"**Passenger Injuries:** {accident_data['PASSINJ']}")
+            st.write(f"**Passenger Killed:** {accident_data['PASSKLD']}")
+            st.write(f"**Other Injuries:** {accident_data['OTHERINJ']}")
+            st.write(f"**Other Killed:** {accident_data['OTHERKLD']}")
+        
+        with st.expander("Train Information"):
+            st.write(f"**Train Speed:** {accident_data['TRNSPD']} km/h")
+            st.write(f"**Type Speed:** {accident_data['TYPSPD']} km/h")
+            st.write(f"**Train Number:** {accident_data['TRNNBR']}")
+            st.write(f"**Train Direction:** {accident_data['TRNDIR']}")
+            st.write(f"**Tons:** {accident_data['TONS']}")
+        
+        # Display Narration
+        st.subheader("Accident Narration")
+        st.write(f"**Narration:** {accident_data['NARR']}")
+
+        return True
+    
+    return False
