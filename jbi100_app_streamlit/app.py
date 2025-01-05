@@ -61,7 +61,7 @@ def main():
                 # Generate and display the corresponding plot
                 plot_func = PLOT_FUNCTIONS[key]
                 fig = plot_func(map_data[selected_filter], selected_variable, second_selected_var)
-                st.pyplot(fig)
+                st.plotly_chart(fig, use_container_width=True)
             else:
                 st.write("No predefined plot available for this selection.")
 

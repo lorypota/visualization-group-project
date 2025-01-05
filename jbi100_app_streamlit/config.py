@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Load environment variables
 load_dotenv()
@@ -102,46 +103,69 @@ VARNAMES_TO_DATASET = {
 
 
 def plot_bar_chart(data, categorical_var, numerical_var):
-
-    fig, ax = plt.subplots()
     cat_var_data = VARNAMES_TO_DATASET[categorical_var]
     num_var_data = VARNAMES_TO_DATASET[numerical_var]
+    
     if num_var_data == "Number of Accidents":
         grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
+        fig = px.bar(
+            grouped_data,
+            x=cat_var_data,
+            y='Counts',
+            title=f"{categorical_var} vs Number of Accidents",
+            labels={cat_var_data: categorical_var, 'Counts': 'Number of Accidents'}
+        )
     else:
-        grouped_data = data.groupby(cat_var_data)[num_var_data].mean()
-    grouped_data.plot(kind='bar', ax=ax)
-    ax.set_title(f"{categorical_var} vs {numerical_var}")
-    ax.set_xlabel(categorical_var)
-    ax.set_ylabel(numerical_var)
+        grouped_data = data.groupby(cat_var_data)[num_var_data].mean().reset_index()
+        fig = px.bar(
+            grouped_data,
+            x=cat_var_data,
+            y=num_var_data,
+            title=f"{categorical_var} vs {numerical_var}",
+            labels={cat_var_data: categorical_var, num_var_data: numerical_var}
+        )
     return fig
 
 
 def plot_line_chart(data, x_var, y_var):
-
     x_var_data = VARNAMES_TO_DATASET[x_var]
     y_var_data = VARNAMES_TO_DATASET[y_var]
-    fig, ax = plt.subplots()
+    
     if y_var_data == "Number of Accidents":
-       grouped_data = data.groupby(x_var_data).size().reset_index(name='Counts')
+        grouped_data = data.groupby(x_var_data).size().reset_index(name='Counts')
+        fig = px.line(
+            grouped_data,
+            x=x_var_data,
+            y='Counts',
+            title=f"{x_var} vs Number of Accidents",
+            labels={x_var_data: x_var, 'Counts': 'Number of Accidents'}
+        )
     else:
-       grouped_data = data.groupby(x_var_data)[y_var_data].mean()
-    grouped_data.plot(kind='line', ax=ax)
-    ax.set_title(f"{x_var} vs {x_var}")
-    ax.set_xlabel(x_var)
-    ax.set_ylabel(y_var)
+        grouped_data = data.groupby(x_var_data)[y_var_data].mean().reset_index()
+        fig = px.line(
+            grouped_data,
+            x=x_var_data,
+            y=y_var_data,
+            title=f"{x_var} vs {y_var}",
+            labels={x_var_data: x_var, y_var_data: y_var}
+        )
     return fig
+
 
 def plot_scatter(data, x_var, y_var):
     x_var_data = VARNAMES_TO_DATASET[x_var]
     y_var_data = VARNAMES_TO_DATASET[y_var]
-
-    fig, ax = plt.subplots()
-    ax.scatter(data[x_var_data], data[y_var_data], alpha=0.7)
-    ax.set_title(f"{x_var} vs {y_var}")
-    ax.set_xlabel(x_var)
-    ax.set_ylabel(y_var)
+    
+    fig = px.scatter(
+        data,
+        x=x_var_data,
+        y=y_var_data,
+        title=f"{x_var} vs {y_var}",
+        labels={x_var_data: x_var, y_var_data: y_var},
+        opacity=0.7
+    )
     return fig
+
 
 
 PLOT_FUNCTIONS = { ("Weather", "Number of Accidents"): plot_bar_chart, 
