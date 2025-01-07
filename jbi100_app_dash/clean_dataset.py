@@ -178,6 +178,23 @@ def drop_0_coord_entries(df):
     """
     return df[(df['Latitude'] != 0) & (df['Longitude'] != 0)].copy()
 
+def sanity_checks(df):
+    """
+    Drops all entries where entries do not satisfy sanity checks
+    """
+    #temp 1 outlier max temp, lower temps look okay
+    max_temp = 150
+    old_size = df.shape[0]
+    count_temp= df[df['TEMP'] < max_temp].shape[0]
+    print(f"Deleting {old_size - count_temp} based on temp")
+    df = df[df['TEMP']< max_temp]
+
+    return df
+    #speed, totkld, totinjured, did check, looks fine
+    #damage costs
+
+
+
 
 pd.set_option('display.max_columns', None)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -198,7 +215,7 @@ df_railroad=filter_measure_errors(df_railroad)
 df_railroad=create_datetime_column(df_railroad)
 if DROP_0_COORD:
     df_railroad=drop_0_coord_entries(df_railroad)
-    
+df_railroad = sanity_checks(df_railroad)    
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
 
