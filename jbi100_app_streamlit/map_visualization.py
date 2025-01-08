@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import json
-from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, STYLE
+from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, PLOT_FUNCTIONS
 
 selected_data = None
 unselected_data = None
@@ -131,7 +131,7 @@ def check_single_event():
     global selected_data
     
     # Debugging: Print the length and columns of the selected data
-    print('This is the length of selected data:', len(selected_data))
+    # print('This is the length of selected data:', len(selected_data))
     
     # Check if only one event is selected
     if len(selected_data) == 1:
@@ -213,3 +213,21 @@ def bar_callback():
         # Display the selected data in the app
         print("Selected Data as DataFrame:")
         print(df_selected)
+
+
+def update_bottom_panel(key, selected_filter, selected_variable, second_selected_var):
+    if key in PLOT_FUNCTIONS:
+        global selected_data
+        plot_func = PLOT_FUNCTIONS[key]
+        
+        if len(selected_data) == 0:
+            selected_data = st.session_state.map_data[selected_filter].copy()
+        # Now pass the filtered data to the plot function
+        fig = plot_func(selected_data, selected_variable, second_selected_var)
+        
+        # Display the plot
+        st.plotly_chart(fig, on_select=bar_callback, key="bar", use_container_width=True)
+    else:
+        st.write("No predefined plot available for this selection.")
+
+    

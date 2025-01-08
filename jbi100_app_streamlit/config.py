@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import plotly.express as px
-
+import pandas as pd
 # Load environment variables
 load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
@@ -136,7 +136,6 @@ VARNAMES_TO_DATASET = {
 def plot_bar_chart(data, categorical_var, numerical_var):
     cat_var_data = VARNAMES_TO_DATASET[categorical_var]
     num_var_data = VARNAMES_TO_DATASET[numerical_var]
-    
     if num_var_data == "Number of Accidents":
         grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
         fig = px.bar(

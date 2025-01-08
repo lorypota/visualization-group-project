@@ -1,6 +1,6 @@
 import streamlit as st
 from filters import setup_filters
-from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event, bar_callback
+from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event, update_bottom_panel
 from styles import CSS_STYLE
 from config import VARIABLES, PLOT_FUNCTIONS
 import plotly.express as px
@@ -57,9 +57,7 @@ def main():
             if selected_variable and second_selected_var:
                 key = (selected_variable, second_selected_var)
                 if key in PLOT_FUNCTIONS:
-                    plot_func = PLOT_FUNCTIONS[key]
-                    fig = plot_func(map_data[selected_filter], selected_variable, second_selected_var)
-                    st.plotly_chart(fig, on_select=bar_callback, key="bar", use_container_width=True)
+                    update_bottom_panel(key, selected_filter, selected_variable, second_selected_var)
                 else:
                     st.write("No predefined plot available for this selection.")
 
