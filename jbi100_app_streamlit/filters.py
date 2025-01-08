@@ -1,6 +1,7 @@
 import pandas as pd
 from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS, KILL_BUCKETS, INJURED_BUCKETS, COSTS_BUCKETS
 import streamlit as st
+import math
 
 
 def filter_by_date(data, start_date, end_date):
@@ -77,23 +78,25 @@ def setup_filters(map_data):
         return "Start date cannot be after end date." # Error message
     
     # Temperature Slider
-    min_temp = map_data['TEMP'].min()
-    max_temp = map_data['TEMP'].max()
+    min_temp = int(math.floor(map_data['TEMP'].min()))
+    max_temp = int(math.ceil(map_data['TEMP'].max()))
     temp_range = st.sidebar.slider(
             "Temperature Range (F)",
-            min_value=float(min_temp),
-            max_value=float(max_temp),
-            value=(float(min_temp), float(max_temp))
+            min_value=min_temp,
+            max_value=max_temp,
+            value=(min_temp, max_temp),
+            step=1
         )
     
     # Speed Slider
-    min_speed = map_data['TRNSPD'].min()
-    max_speed = map_data['TRNSPD'].max()
+    min_speed = int(math.floor(map_data['TRNSPD'].min()))
+    max_speed = int(math.ceil(map_data['TRNSPD'].max()))
     speed_range = st.sidebar.slider(
             "Speed Range (mph)",
-            min_value=float(min_speed),
-            max_value=float(max_speed),
-            value=(float(min_speed), float(max_speed))
+            min_value=min_speed,
+            max_value=max_speed,
+            value=(min_speed, max_speed),
+            step=1
         )
     
     # Incident Type filters
