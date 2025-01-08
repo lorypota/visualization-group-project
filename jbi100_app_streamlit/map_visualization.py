@@ -75,10 +75,6 @@ def map(fig, data, selected_filter):
             lambda row: (row['Latitude'], row['Longitude']) not in selected_coords, axis=1
         )].copy()
 
-        # Add hover labels without mutating the original DataFrame
-        selected_data['hover_label'] = 'Selected'
-        unselected_data['hover_label'] = 'Unselected'
-
 def marker_properties_selected():
     return dict(size=6, opacity=0.8, color='red')
 
@@ -92,10 +88,6 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
     selected_data = data[selected_filter].copy()
     unselected_data = data[~selected_filter].copy()
 
-    # Add hover labels without mutating the original DataFrame
-    selected_data['hover_label'] = 'Selected'
-    unselected_data['hover_label'] = 'Unselected'
-
     # Remove existing traces
     fig.data = []
 
@@ -103,12 +95,16 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
     fig.add_scattermapbox(
         lat=unselected_data["Latitude"].tolist(),
         lon=unselected_data["Longitude"].tolist(),
-        hovertext=(unselected_data["DATETIME"].astype(
-            str) + " - " + unselected_data["hover_label"]).tolist(),
+        hovertext=(
+            unselected_data["DATETIME"].dt.strftime('%Y-%m-%d %H:%M') + 
+            "<br>Lat: " + unselected_data["Latitude"].astype(str) + 
+            "<br>Lon: " + unselected_data["Longitude"].astype(str)
+        ).tolist(),
         mode='markers',
         marker=marker_properties_unselected(),
         selected=dict(marker=marker_properties_unselected()),
         unselected=dict(marker=marker_properties_unselected()),
+        hovertemplate="%{hovertext}<extra></extra>",
         name="Unselected",
     )
 
@@ -116,12 +112,16 @@ def update_figure_data(fig, data, selected_filter, selected_markers=None):
     fig.add_scattermapbox(
         lat=selected_data["Latitude"].tolist(),
         lon=selected_data["Longitude"].tolist(),
-        hovertext=(selected_data["DATETIME"].astype(
-            str) + " - " + selected_data["hover_label"]).tolist(),
+        hovertext=(
+            selected_data["DATETIME"].dt.strftime('%Y-%m-%d %H:%M') + 
+            "<br>Lat: " + selected_data["Latitude"].astype(str) + 
+            "<br>Lon: " + selected_data["Longitude"].astype(str)
+        ).tolist(),
         mode='markers',
         marker=marker_properties_selected(),
         selected=dict(marker=marker_properties_selected()),
         unselected=dict(marker=marker_properties_unselected()),
+        hovertemplate="%{hovertext}<extra></extra>",
         name="Selected",
     )
 
