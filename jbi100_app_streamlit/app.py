@@ -7,6 +7,12 @@ from config import VARIABLES, PLOT_FUNCTIONS
 st.set_page_config(layout="wide")
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 
+# Name and logo
+st.sidebar.write("<div style='text-align:center;'><h1>RailAlert!</h1></div>", unsafe_allow_html=True)
+col1, col2, col3 = st.sidebar.columns([1, 2, 1])
+with col2:
+    st.image("jbi100_app_streamlit/assets/RailAlertLogoNoBckg.png",
+             use_container_width=True)
 
 def main():
     initialize_data()
