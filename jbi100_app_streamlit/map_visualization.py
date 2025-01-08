@@ -191,3 +191,25 @@ def check_single_event():
         return True
     
     return False
+
+
+def bar_callback():
+    if st.session_state.bar:
+        # Access the selected points from the bar chart
+        selected_points = st.session_state.bar['selection']['points']
+        
+        # Extract relevant information from the selected points (e.g., 'x' and 'y' values)
+        selected_data = []
+        for point in selected_points:
+            selected_data.append({
+                'Category': point['x'],  # 'x' corresponds to the categorical variable
+                'Value': point['y']      # 'y' corresponds to the numerical variable (if applicable)
+            })
+        
+        # Convert the selected data into a DataFrame
+        import pandas as pd
+        df_selected = pd.DataFrame(selected_data)
+        
+        # Display the selected data in the app
+        print("Selected Data as DataFrame:")
+        print(df_selected)
