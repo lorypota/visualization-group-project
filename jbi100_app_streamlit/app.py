@@ -22,42 +22,37 @@ def main():
         
         # Display the map visualization
         map(st.session_state.fig, map_data, selected_filter)
-    
 
+   
     # example containers
     # check if only 1 event is selected on the map:
     if check_single_event():
-        st.success("Meta-information displayed for the selected accident.")
+        # st.success("Meta-information displayed for the selected accident.")
+        pass
     else:
-        container1, container2 = st.columns(2)
+        padding_left, container1, container2, padding_right = st.columns([0.1, 1, 5, 0.1], gap="large")
 
-        
         with container1:
-            st.subheader("Controls")
+            st.divider()
             st.write("Select the variables you want to analyze.") 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.write("First variable of Interest:")
-                selected_variable = None
-                selected_variable = st.radio( "Choose one variable", 
-                                            options=list(VARIABLES.keys()), 
-                                            key="first_variable"
-                                                    )
-            with col2:
-                if selected_variable:
-                    second_selected_var = "Number of Accidents" #default
-                    st.write(f"Choose a second Variable of Interest to:{selected_variable}:")
-                    # Use a radio button for single selection
-                    options = VARIABLES[selected_variable]
-                    second_selected_var = st.radio("Choose one variable",
-                                                options=options,
-                                                key=f"radio_{selected_variable}"
-                                                                                )
-    
 
+            # Compact dropdown menus
+            selected_variable = st.selectbox(
+                "First Variable of Interest:",
+                options=list(VARIABLES.keys()),
+                key="first_variable"
+            )
+
+            second_selected_var = None
+            if selected_variable:
+                second_selected_var = st.selectbox(
+                    f"Second Variable of Interest (for {selected_variable}):",
+                    options=VARIABLES[selected_variable],
+                    key=f"dropdown_{selected_variable}"
+                )
+    
         with container2:
-            st.subheader("Visualization")
-            st.write("This is the corresponding visualization.")
+
             if selected_variable and second_selected_var:
                 key = (selected_variable, second_selected_var)
                 print(key)
@@ -68,6 +63,7 @@ def main():
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.write("No predefined plot available for this selection.")
+
 
 if __name__ == "__main__":
     main()

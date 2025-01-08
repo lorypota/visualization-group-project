@@ -109,27 +109,27 @@ COSTS_BUCKETS = {
 
 
 VARIABLES = {
-    "Incident Type": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
-    "Weather": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
-    "Visibility": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
-    "Track Type": ["Number of Accidents", "Year", "Speed", "Total Damage Costs"],
-    "Year": ["Number of Accidents", "Incident Type", "Speed", "Temperature", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
-    "Temperature": ["Number of Accidents", "Incident Type", "Speed", "Year", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
-    "Speed": ["Number of Accidents", "Incident Type", "Speed", "Year", "Track Type", "Weather", "Visibility", "Total Damage Costs"],
+    "💥 Incident Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
+    "🌥️ Weather": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
+    "🌫️ Visibility": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
+    "🚊 Track Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
+    "🗓️ Year": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
+    "🌡️ Temperature": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
+    "🚄 Speed": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
     
 }
 
 VARNAMES_TO_DATASET = {
     "Number of Accidents": "Number of Accidents" ,
-    "Weather": "WEATHER",
-    "Visibility": "VISIBLTY",
-    "Track Type": "TYPTRK",
-    "Year": "YEAR",
-    "Speed" : "TRNSPD",
-    "Temperature" : "TEMP",
-    "State": "STATE",
-    "Incident Type": "TYPE",
-    "Total Damage Costs": "ACCDMG"
+    "🌥️ Weather": "WEATHER",
+    "🌫️ Visibility": "VISIBLTY",
+    "🚊 Track Type": "TYPTRK",
+    "🗓️ Year": "YEAR",
+    "🚄 Speed" : "TRNSPD",
+    "🌡️ Temperature" : "TEMP",
+    "🇺🇸 State": "STATE",
+    "💥 Incident Type": "TYPE",
+    "💸 Total Damage Costs": "ACCDMG"
 }
 
 
@@ -199,23 +199,23 @@ def plot_scatter(data, x_var, y_var):
 
 
 
-PLOT_FUNCTIONS = { ("Weather", "Number of Accidents"): plot_bar_chart, 
-                  ("Visibility", "Number of Accidents"): plot_bar_chart,
-                  ("Track Type", "Number of Accidents"): plot_bar_chart,
-                  ("Incident Type", "Number of Accidents"): plot_bar_chart,
-                  ("Year", "Number of Accidents"): plot_line_chart,
-                  ("Speed", "Number of Accidents"): plot_line_chart,
-                  ("Temperature", "Number of Accidents"): plot_line_chart,
-                  ("Year", "Speed"): plot_scatter,
-                  ("Year", "Total Damage Costs") : plot_scatter,
-                  ("Speed", "Total Damage Costs") : plot_scatter,
-                  ("Track Type", "Speed"): plot_bar_chart,
-                  ("Visibility", "Speed"): plot_bar_chart,
-                  ("Weather", "Speed"): plot_bar_chart,
-                  ("Incident Type", "Speed"): plot_bar_chart,
-                  ("Track Type", "Total Damage Costs"): plot_bar_chart,
-                  ("Visibility", "Total Damage Costs" ): plot_bar_chart,
-                  ("Weather", "Total Damage Costs"): plot_bar_chart,
-                  ("Incident Type", "Total Damage Costs"): plot_bar_chart
+PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
+                  ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
+                  ("🚊 Track Type", "Number of Accidents"): plot_bar_chart,
+                  ("💥 Incident Type", "Number of Accidents"): plot_bar_chart,
+                  ("🗓️ Year", "Number of Accidents"): plot_line_chart,
+                  ("🚄 Speed", "Number of Accidents"): plot_line_chart,
+                  ("🌡️ Temperature", "Number of Accidents"): plot_line_chart,
+                  ("🗓️ Year", "🚄 Speed"): plot_scatter,
+                  ("🗓️ Year", "💸 Total Damage Costs") : plot_scatter,
+                  ("🚄 Speed", "💸 Total Damage Costs") : plot_scatter,
+                  ("🚊 Track Type", "🚄 Speed"): plot_bar_chart,
+                  ("🌫️ Visibility", "🚄 Speed"): plot_bar_chart,
+                  ("🌥️ Weather", "🚄 Speed"): plot_bar_chart,
+                  ("💥 Incident Type", "🚄 Speed"): plot_bar_chart,
+                  ("🚊 Track Type", "💸 Total Damage Costs"): plot_bar_chart,
+                  ("🌫️ Visibility", "💸 Total Damage Costs" ): plot_bar_chart,
+                  ("🌥️ Weather", "💸 Total Damage Costs"): plot_bar_chart,
+                  ("💥 Incident Type", "💸 Total Damage Costs"): plot_bar_chart
 
 }

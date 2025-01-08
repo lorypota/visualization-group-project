@@ -6,10 +6,16 @@ CSS_STYLE = '''
     [data-testid="stSidebar"][aria-expanded="true"] {
         min-width: 350px;
     }
+    #root > div:nth-child(1) > div.withScreencast > div > div > div > section.main > div.block-container > div > div > div{
+        gap: 0rem !important; /* Delete top gap */
+    }
+    #stVerticalBlock {
+        gap: 0rem !important;
+    }
     header {visibility: hidden;}
     footer {visibility: hidden;}
     .full-screen-map {
-        height: calc(100vh); /* Full viewport height minus Streamlit padding */
+        height: calc(100vh); 
         margin: 0;
         padding: 0;
         top: 0;
