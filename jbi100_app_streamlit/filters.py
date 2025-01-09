@@ -56,6 +56,30 @@ def filter_by_region(data, region):
     else:  # Continental USA
         return data[~((data['Latitude'] > 50) & (data['Longitude'] < -130))]
 
+def bucket_to_numeric(bucket, data):
+    if bucket == "0":
+        return 0
+    elif bucket == "0.25 million":
+        return 250000       
+    elif bucket == "0.5 million":
+        return 500000
+    elif bucket == "1 million":
+        return 1000000
+    elif bucket == "2 million":
+        return 2000000
+    elif bucket == "5 million":
+        return 5000000
+    elif bucket == "10 million":
+        return 10000000
+    elif bucket == "20 million":
+        return 20000000
+    elif bucket == "20+ million":
+        return int(math.ceil(data['ACCDMG'].max()))
+    
+def bucket_to_numeric_injured(bucket, data):
+    if bucket == "100+":
+        return int(math.ceil(data['TOTINJ'].max()))  # Use infinity for open-ended range
+    return bucket  # Return numeric values as is
 
 def setup_filters(map_data):
     st.sidebar.header("Filters")
@@ -109,24 +133,6 @@ def setup_filters(map_data):
             value=(min_kill, max_kill),
             step=1
         )
-    
-    def bucket_to_numeric(bucket):
-        if bucket == "0":
-            return 0
-        elif bucket == "0.25 million":
-            return 250000
-        elif bucket == "0.5 million":
-            return 500000
-        elif bucket == "1 million":
-            return 1000000
-        elif bucket == "2 million":
-            return 2000000
-        elif bucket == "5 million":
-            return 5000000
-        elif bucket == "10 million":
-            return 10000000
-        elif bucket == "20 million":
-            return 20000000
 
     # Sidebar slider for Damage Costs
     min_costs = int(math.floor(map_data['ACCDMG'].min()))
@@ -137,33 +143,18 @@ def setup_filters(map_data):
         value=(COSTS_BUCKETS[0], COSTS_BUCKETS[-1]), # Default to full range
         format_func=lambda x: x
         )
-    min_costs = bucket_to_numeric(cost_range[0])
-    max_costs = bucket_to_numeric(cost_range[1])
-
-
-    def bucket_to_numeric_injured(bucket):
-        if bucket == "100+":
-            return float('inf')  # Use infinity for open-ended range
-        return bucket  # Return numeric values as is
-
+    min_costs = bucket_to_numeric(cost_range[0], map_data)
+    max_costs = bucket_to_numeric(cost_range[1], map_data)
 
     # Sidebar slider for Total Injured
-    min_costs = int(math.floor(map_data['TOTINJ'].min()))
-    max_costs = int(math.ceil(map_data['TOTINJ'].max()))
     inj_range = st.sidebar.select_slider(
         "Select Total Injured Range:",
         options=INJURED_BUCKETS,
         value=(INJURED_BUCKETS[0], INJURED_BUCKETS[-1]), # Default to full range
         format_func=lambda x: str(x)
         )
-    min_inj = bucket_to_numeric_injured(inj_range[0])
-    max_inj = bucket_to_numeric_injured(inj_range[1])
-    if max_inj == float('inf'):
-        max_inj = map_data['TOTINJ'].max()
-
-
-
-
+    min_inj = bucket_to_numeric_injured(inj_range[0], map_data)
+    max_inj = bucket_to_numeric_injured(inj_range[1], map_data)
 
     # Incident Type filters
     with st.sidebar.expander("Incident Types", expanded=False):
@@ -326,3 +317,5 @@ def setup_filters(map_data):
     )
 
     return selected_filter
+
+
