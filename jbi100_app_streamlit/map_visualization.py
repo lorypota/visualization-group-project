@@ -197,25 +197,18 @@ def bar_callback():
     if st.session_state.bar:
         # Access the selected points from the bar chart
         selected_points = st.session_state.bar['selection']['points']
-        
-        # Extract relevant information from the selected points (e.g., 'x' and 'y' values)
-        selected_data = []
+        # Extract relevant information from the selected points (e.g., 'x', 'y', 'customdata')
         for point in selected_points:
-            selected_data.append({
-                'Category': point['x'],  # 'x' corresponds to the categorical variable
-                'Value': point['y']      # 'y' corresponds to the numerical variable (if applicable)
-            })
-        
-        # Convert the selected data into a DataFrame
-        import pandas as pd
-        df_selected = pd.DataFrame(selected_data)
-        
-        # Display the selected data in the app
-        print("Selected Data as DataFrame:")
-        print(df_selected)
+            print(point['x'])
+            # Ensure customdata contains the correct tuple format (latitude, longitude)
+            lat_lon = point['customdata'] # This should be a tuple (latitude, longitude)
+            df = pd.DataFrame(lat_lon)
 
+            # Rename columns to latitude and longitude
+            df.columns = ['latitude', 'longitude']
 
-def update_bottom_panel(key, selected_filter, selected_variable, second_selected_var):
+        
+def update_bottom_panel(key, selected_filter, selected_variable, second_selected_var):  
     if key in PLOT_FUNCTIONS:
         global selected_data
         plot_func = PLOT_FUNCTIONS[key]
@@ -223,8 +216,7 @@ def update_bottom_panel(key, selected_filter, selected_variable, second_selected
         if len(selected_data) == 0:
             selected_data = st.session_state.map_data[selected_filter].copy()
         # Now pass the filtered data to the plot function
-        fig = plot_func(selected_data, selected_variable, second_selected_var)
-        
+        fig = plot_func(selected_data[selected_filter], selected_variable, second_selected_var)
         # Display the plot
         st.plotly_chart(fig, on_select=bar_callback, key="bar", use_container_width=True)
     else:

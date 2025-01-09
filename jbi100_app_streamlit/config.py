@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import plotly.express as px
 import pandas as pd
+import numpy as np
 # Load environment variables
 load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
@@ -142,27 +143,55 @@ VARNAMES_TO_DATASET = {
 }
 
 
+DESCRIPTION_MAPPINGS = {
+    "🌥️ Weather": WEATHER_DESCRIPTIONS,
+    "🌫️ Visibility": VIS_DESCRIPTIONS,
+    "🚊 Track Type": TRACK_DESCRIPTIONS,
+    "💥 Incident Type": TYPE_DESCRIPTIONS,
+}
+
+
 def plot_bar_chart(data, categorical_var, numerical_var):
     cat_var_data = VARNAMES_TO_DATASET[categorical_var]
     num_var_data = VARNAMES_TO_DATASET[numerical_var]
+    # Get axis labels
+    unique_cat_var_labels = np.array(data[cat_var_data].unique(), dtype=int)
+    cat_var_descriptions = DESCRIPTION_MAPPINGS[categorical_var]
+
+    # Match unique labels with their descriptions
+    selected_type_description = [
+    description for code, description in cat_var_descriptions.items()
+    if int(code) in unique_cat_var_labels
+    ]   
+        
+    # Group the data by the categorical variable
     if num_var_data == "Number of Accidents":
         grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
-        fig = px.bar(
-            grouped_data,
-            x=cat_var_data,
-            y='Counts',
-            title=f"{categorical_var} vs Number of Accidents",
-            labels={cat_var_data: categorical_var, 'Counts': 'Number of Accidents'}
-        )
     else:
+        
         grouped_data = data.groupby(cat_var_data)[num_var_data].mean().reset_index()
-        fig = px.bar(
-            grouped_data,
-            x=cat_var_data,
-            y=num_var_data,
-            title=f"{categorical_var} vs {numerical_var}",
-            labels={cat_var_data: categorical_var, num_var_data: numerical_var}
-        )
+
+    # Create a list of latitude and longitude for each category
+    custom_data = []
+    for category in grouped_data[cat_var_data]:
+        category_data = data[data[cat_var_data] == category]
+        lat_lon_pairs = list(zip(category_data['Latitude'], category_data['Longitude']))
+        custom_data.append(lat_lon_pairs)
+    
+    
+    # Create the bar chart
+    fig = px.bar(
+        grouped_data,
+        x=selected_type_description,
+        y='Counts' if num_var_data == "Number of Accidents" else num_var_data,
+        title=f"{categorical_var} vs {numerical_var}",
+        labels={cat_var_data: categorical_var, 'Counts': 'Number of Accidents' if num_var_data == "Number of Accidents" else num_var_data}
+    )
+    
+    # Add custom data (latitude and longitude) to each bar
+    fig.update_traces(customdata=custom_data)
+    
+    # Return the figure
     return fig
 
 
