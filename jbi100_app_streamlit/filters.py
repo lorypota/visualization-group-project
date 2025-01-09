@@ -1,5 +1,5 @@
 import pandas as pd
-from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS, KILL_BUCKETS, INJURED_BUCKETS, COSTS_BUCKETS
+from config import STATE_CODES, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS, INJURED_BUCKETS, COSTS_BUCKETS
 import streamlit as st
 import math
 
@@ -99,6 +99,72 @@ def setup_filters(map_data):
             step=1
         )
     
+    # Kill Slider
+    min_kill = int(math.floor(map_data['TOTKLD'].min()))
+    max_kill = int(math.ceil(map_data['TOTKLD'].max()))
+    kill_range = st.sidebar.slider(
+            "Total People Killed",
+            min_value=min_kill,
+            max_value=max_kill,
+            value=(min_kill, max_kill),
+            step=1
+        )
+    
+    def bucket_to_numeric(bucket):
+        if bucket == "0":
+            return 0
+        elif bucket == "0.25 million":
+            return 250000
+        elif bucket == "0.5 million":
+            return 500000
+        elif bucket == "1 million":
+            return 1000000
+        elif bucket == "2 million":
+            return 2000000
+        elif bucket == "5 million":
+            return 5000000
+        elif bucket == "10 million":
+            return 10000000
+        elif bucket == "20 million":
+            return 20000000
+
+    # Sidebar slider for Damage Costs
+    min_costs = int(math.floor(map_data['ACCDMG'].min()))
+    max_costs = int(math.ceil(map_data['ACCDMG'].max()))
+    cost_range = st.sidebar.select_slider(
+        "Select Damage Cost Range:",
+        options=COSTS_BUCKETS,
+        value=(COSTS_BUCKETS[0], COSTS_BUCKETS[-1]), # Default to full range
+        format_func=lambda x: x
+        )
+    min_costs = bucket_to_numeric(cost_range[0])
+    max_costs = bucket_to_numeric(cost_range[1])
+
+
+    def bucket_to_numeric_injured(bucket):
+        if bucket == "100+":
+            return float('inf')  # Use infinity for open-ended range
+        return bucket  # Return numeric values as is
+
+
+    # Sidebar slider for Total Injured
+    min_costs = int(math.floor(map_data['TOTINJ'].min()))
+    max_costs = int(math.ceil(map_data['TOTINJ'].max()))
+    inj_range = st.sidebar.select_slider(
+        "Select Total Injured Range:",
+        options=INJURED_BUCKETS,
+        value=(INJURED_BUCKETS[0], INJURED_BUCKETS[-1]), # Default to full range
+        format_func=lambda x: str(x)
+        )
+    min_inj = bucket_to_numeric_injured(inj_range[0])
+    max_inj = bucket_to_numeric_injured(inj_range[1])
+    if max_inj == float('inf'):
+        max_inj = map_data['TOTINJ'].max()
+
+
+
+
+
     # Incident Type filters
     with st.sidebar.expander("Incident Types", expanded=False):
         cols = st.columns(2)
@@ -148,82 +214,6 @@ def setup_filters(map_data):
                 description, value=st.session_state[key], key=key
             )
     
-    # TOT KILLED buckets
-    with st.sidebar.expander("Total People Killed", expanded=False):
-        cols = st.columns(2)
-        kill_per_col = -(-len(KILL_BUCKETS) // 2)  # Divide into two columns
-
-        # Select All/Deselect All buttons
-        col1, col2 = st.columns([1, 1])
-        if col1.button("Select All", key="select_all_killed"):
-            for bucket in KILL_BUCKETS.keys():
-                st.session_state[f"kill_{bucket}"] = True
-        if col2.button("Deselect All", key="deselect_all_killed"):
-            for bucket in KILL_BUCKETS.keys():
-                st.session_state[f"kill_{bucket}"] = False
-
-        # Render checkboxes for each bucket
-        selected_killed = {}
-        for i, bucket in enumerate(KILL_BUCKETS.keys()):  # Use bucket keys for labels
-            col_index = i // kill_per_col  # Determine column index
-            key = f"kill_{bucket}"
-            if key not in st.session_state:
-                st.session_state[key] = True  # Default to selected
-            selected_killed[bucket] = cols[col_index].checkbox(
-                f"{bucket}", value=st.session_state[key], key=key
-            )
-
-    # TOT INJURED buckets
-    with st.sidebar.expander("Total People Injured", expanded=False):
-        cols = st.columns(2)
-        injured_per_col = -(-len(INJURED_BUCKETS) // 2)  # Divide into two columns
-
-        # Select All/Deselect All buttons
-        col1, col2 = st.columns([1, 1])
-        if col1.button("Select All", key="select_all_injured"):
-            for bucket in INJURED_BUCKETS.keys():
-                st.session_state[f"injured_{bucket}"] = True
-        if col2.button("Deselect All", key="deselect_all_injured"):
-            for bucket in INJURED_BUCKETS.keys():
-                st.session_state[f"injured_{bucket}"] = False
-
-        # Render checkboxes for each bucket
-        selected_injured = {}
-        for i, bucket in enumerate(INJURED_BUCKETS.keys()):  # Use bucket keys for labels
-            col_index = i // injured_per_col  # Determine column index
-            key = f"injured_{bucket}"
-            if key not in st.session_state:
-                st.session_state[key] = True  # Default to selected
-            selected_injured[bucket] = cols[col_index].checkbox(
-                f"{bucket}", value=st.session_state[key], key=key
-            )
-
-
-    # TOT COSTS buckets
-    with st.sidebar.expander("Damage Costs", expanded=False):
-        cols = st.columns(2)
-        costs_per_col = -(-len(COSTS_BUCKETS) // 2)  # Divide into two columns
-
-        # Select All/Deselect All buttons
-        col1, col2 = st.columns([1, 1])
-        if col1.button("Select All", key="select_all_costs"):
-            for bucket in COSTS_BUCKETS.keys():
-                st.session_state[f"costs_{bucket}"] = True
-        if col2.button("Deselect All", key="deselect_all_costs"):
-            for bucket in COSTS_BUCKETS.keys():
-                st.session_state[f"costs_{bucket}"] = False
-
-        # Render checkboxes for each bucket
-        selected_costs = {}
-        for i, bucket in enumerate(COSTS_BUCKETS.keys()):  # Use bucket keys for labels
-            col_index = i // costs_per_col  # Determine column index
-            key = f"costs_{bucket}"
-            if key not in st.session_state:
-                st.session_state[key] = True  # Default to selected
-            selected_costs[bucket] = cols[col_index].checkbox(
-                f"{bucket}", value=st.session_state[key], key=key
-            )
-
 
     # Weather filters
     with st.sidebar.expander("Weather", expanded=False):
@@ -307,6 +297,12 @@ def setup_filters(map_data):
         (map_data['TEMP'] <= temp_range[1]) &
         (map_data['TRNSPD'] >= speed_range[0]) &
         (map_data['TRNSPD'] <= speed_range[1]) &
+        (map_data['ACCDMG'] >= min_costs) &
+        (map_data['ACCDMG'] <= max_costs) &
+        (map_data['TOTKLD'] >= kill_range[0]) &
+        (map_data['TOTKLD'] <= kill_range[1]) &
+        (map_data['TOTINJ'] >= min_inj) & 
+        (map_data['TOTINJ'] <= max_inj) &
         (map_data['TYPE'].isin(
             [int(code) for code, description in TYPE_DESCRIPTIONS.items()
              if selected_types.get(description, False)]
@@ -326,26 +322,7 @@ def setup_filters(map_data):
         (map_data['STATE'].isin(
             [reverse_state_codes[state]
                 for state, selected in selected_states.items() if selected]
-        )) &
-        (map_data['TOTKLD'].apply(
-            lambda x: any(
-                condition(x) for bucket, condition in KILL_BUCKETS.items()
-                if selected_killed.get(bucket, False)
-            )
-        )) &
-        (map_data['TOTINJ'].apply(
-            lambda x: any(
-                condition(x) for bucket, condition in INJURED_BUCKETS.items()
-                if selected_injured.get(bucket, False)
-            )
-        ))&
-        (map_data['ACCDMG'].apply(
-            lambda x: any(
-                condition(x) for bucket, condition in COSTS_BUCKETS.items()
-                if selected_costs.get(bucket, False)
-            )
-        ))
-        
+        ))   
     )
 
     return selected_filter
