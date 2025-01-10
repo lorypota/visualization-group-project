@@ -235,6 +235,66 @@ def plot_scatter(data, x_var, y_var):
     return fig
 
 
+# def plot_bubble(data, x_var, y_var):
+#     x_var_data = VARNAMES_TO_DATASET[x_var]
+#     y_var_data = VARNAMES_TO_DATASET[y_var]
+
+#     data["speed_bin"] = pd.cut(data[x_var_data], bins=np.arange(0, 135, 20))  # Adjust bin range/size
+#     data["temperature_bin"] = pd.cut(data[y_var_data], bins=np.arange(-30, 118, 10))  # Adjust bin range/size
+    
+#     binned_data = data.groupby(["speed_bin", "temperature_bin"]).size().reset_index(name="incident_count")
+#     binned_data["speed_bin"] = binned_data["speed_bin"].astype(str)
+#     binned_data["temperature_bin"] = binned_data["temperature_bin"].astype(str)
+    
+#     fig = px.scatter(
+#         binned_data,
+#         x="speed_bin",
+#         y="temperature_bin",
+#         size="incident_count",  
+#         title="Bubble Plot: Discretized Speed vs Temperature vs Number of Incidents",
+#         opacity=0.7,
+#         color_continuous_scale=px.colors.sequential.Viridis,
+#         labels={
+#             "speed_bin": "Speed (Binned)",
+#             "temperature_bin": "Temperature (Binned)",
+#             "incident_count": "Number of Incidents"
+#         }
+#     )
+#   return fig
+
+
+def parallel_plot(data, x_var, y_var):
+    x_var_data = VARNAMES_TO_DATASET[x_var]
+    y_var_data = VARNAMES_TO_DATASET[y_var]
+
+    # Quantize temperature and speed into 10 bins
+    data["temperature_bin"] = pd.cut(data[x_var_data], bins=10, precision=1, duplicates="drop")
+    data["speed_bin"] = pd.cut(data[y_var_data], bins=10, precision=1, duplicates="drop")
+
+    # Map binned intervals to numeric values for compatibility with parallel coordinates
+    data["temperature_bin_numeric"] = data["temperature_bin"].cat.codes
+    data["speed_bin_numeric"] = data["speed_bin"].cat.codes
+
+    # Parallel Coordinates Plot
+    fig = px.parallel_coordinates(
+        data,
+        dimensions=[
+            "temperature_bin_numeric",
+            "speed_bin_numeric",
+            VARNAMES_TO_DATASET["🌫️ Visibility"]
+        ],  # Include the axes
+        color=VARNAMES_TO_DATASET["🌫️ Visibility"],  # Use visibility for coloring
+        color_continuous_scale=px.colors.sequential.Viridis,
+        labels={
+            "temperature_bin_numeric": "Temperature (Binned)",
+            "speed_bin_numeric": "Speed (Binned)",
+            VARNAMES_TO_DATASET["🌫️ Visibility"]: "Visibility (miles)",
+        },
+        title="Parallel Coordinates Plot: Temperature, Speed, Visibility"
+    )
+
+    return fig
+
 
 PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
@@ -282,5 +342,6 @@ PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart,
                   ("🌫️ Visibility", "Total People Killed"): plot_bar_chart,
                   ("🌥️ Weather", "Total People Killed"): plot_bar_chart,
                   ("💥 Incident Type", "Total People Killed"): plot_bar_chart,
+                  ("test"): parallel_plot,
 
 }
