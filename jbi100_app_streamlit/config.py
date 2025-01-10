@@ -162,12 +162,6 @@ def plot_bar_chart(data, categorical_var, numerical_var):
         
         grouped_data = data.groupby(cat_var_data)[num_var_data].mean().reset_index()
 
-    # Create a list of latitude and longitude for each category
-    custom_data = []
-    for category in grouped_data[cat_var_data]:
-        category_data = data[data[cat_var_data] == category]
-        lat_lon_pairs = list(zip(category_data['Latitude'], category_data['Longitude']))
-        custom_data.append(lat_lon_pairs)
     
     
     # Create the bar chart
@@ -180,7 +174,7 @@ def plot_bar_chart(data, categorical_var, numerical_var):
     )
     
     # Add custom data (latitude and longitude) to each bar
-    fig.update_traces(customdata=custom_data)
+    fig.update_traces(customdata=[[categorical_var, numerical_var]] * len(data))
     
     # Return the figure
     return fig
@@ -197,6 +191,7 @@ def plot_line_chart(data, x_var, y_var):
             x=x_var_data,
             y='Counts',
             title=f"{x_var} vs Number of Accidents",
+            markers=True,
             labels={x_var_data: x_var, 'Counts': 'Number of Accidents'}
         )
     else:
@@ -206,8 +201,12 @@ def plot_line_chart(data, x_var, y_var):
             x=x_var_data,
             y=y_var_data,
             title=f"{x_var} vs {y_var}",
+            markers=True,
             labels={x_var_data: x_var, y_var_data: y_var}
         )
+        
+    # Pass only metadata as customdata
+    fig.update_traces(customdata=[[x_var, y_var]] * len(data))
     return fig
 
 
@@ -223,6 +222,9 @@ def plot_scatter(data, x_var, y_var):
         labels={x_var_data: x_var, y_var_data: y_var},
         opacity=0.7
     )
+
+    # Pass only metadata as customdata
+    fig.update_traces(customdata=[[x_var, y_var]] * len(data))
     return fig
 
 
