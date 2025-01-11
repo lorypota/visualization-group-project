@@ -2,7 +2,8 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import json
-from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, PLOT_FUNCTIONS, TYPE_DESCRIPTIONS, VARNAMES_TO_DATASET, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS
+from datetime import date
+from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, PLOT_FUNCTIONS, STATE_CODES, TRACK_DESCRIPTIONS, TYPE_DESCRIPTIONS, VARNAMES_TO_DATASET, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS
 
 selected_data = None
 unselected_data = None
@@ -152,6 +153,8 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
         )
         
     else:
+        st.session_state.callback_data['selected_data_back'] = []
+        st.session_state.callback_data['unselected_data_back'] = []
         # Add the unselected trace first
         fig.add_scattermapbox(
             lat=unselected_data["Latitude"].tolist(),
@@ -199,6 +202,8 @@ def check_single_event():
     if len(selected_data) == 1:
         padding_left, content, padding_right = st.columns([0.05, 1, 0.05], gap="small")
         with content:
+            st.write("")
+            st.write("")
             # Display meta-information in a structured format
             col1, col2 = st.columns(2)
             st.subheader("Meta-Information for Selected Accident")
@@ -210,7 +215,7 @@ def check_single_event():
             # Location Information
             with col1:
                 st.subheader("Location Information")
-                st.write(f"**State:** {accident_data['STATE']}")
+                st.write(f"**State:** {STATE_CODES[accident_data['STATE']]}")
                 st.write(f"**County:** {accident_data['COUNTY']}")
                 st.write(f"**Latitude:** {accident_data['Latitude']}")
                 st.write(f"**Longitude:** {accident_data['Longitude']}")
@@ -220,7 +225,8 @@ def check_single_event():
             with col2:
                 st.subheader("Timing Information")
                 st.write(f"**Year:** {accident_data['YEAR']}")
-                st.write(f"**Month:** {accident_data['MONTH']}")
+                month = date(1900, accident_data['MONTH'], 1).strftime('%B')
+                st.write(f"**Month:** {month}")
                 st.write(f"**Day:** {accident_data['DAY']}")
                 st.write(f"**Time:** {accident_data['TIMEHR']}:{accident_data['TIMEMIN']} {accident_data['AMPM']}")
             
@@ -247,9 +253,9 @@ def check_single_event():
                 st.write(f"**Tons:** {accident_data['TONS']}")
             
             # Display Narration
-            st.subheader("Accident Narration")
+            st.subheader("Accident Description")
             st.write(f"**Narration:** {accident_data['NARR']}")
-
+            st.write("")
         return True
     
     return False
@@ -384,5 +390,12 @@ def update_bottom_panel(key, selected_filter, selected_variable, second_selected
         st.plotly_chart(fig, on_select=bar_callback, key="bottom_panel", use_container_width=True)        
     else:
         st.write("No predefined plot available for this selection.")
+
+    # WIP
+    funct = PLOT_FUNCTIONS["test"]
+    if len(selected_data) == 0:
+            selected_data = st.session_state.map_data[selected_filter].copy()
+    parallel_fig = funct(selected_data, "🌡️ Temperature", "🚄 Speed")
+    st.plotly_chart(parallel_fig, use_container_width=True)
 
     

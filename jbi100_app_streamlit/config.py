@@ -78,14 +78,21 @@ TRACK_DESCRIPTIONS = {
     '4': 'Industry',
 }
 
-KILL_BUCKETS = {
-    "0": lambda x: x == 0,
-    "1": lambda x: x == 1,
-    "2": lambda x: x == 2,
-    "3+": lambda x: x >= 3,
-}
 
-INJURED_BUCKETS = {
+
+INJURED_BUCKETS = [
+    0,
+    5,
+    10,
+    20,
+    50,
+    75,
+    100,
+    "100+"
+]
+
+
+INJURED_BUCKETS2 = {
     "0": lambda x: x == 0,
     "1-5": lambda x: (x > 0) & (x < 6),
     "6-10": lambda x: (x > 5) & (x < 11),
@@ -96,28 +103,28 @@ INJURED_BUCKETS = {
     "100+": lambda x: x > 99
 }
 
-COSTS_BUCKETS = {
-    "0": lambda x: x == 0,
-    "0-0.25 million": lambda x: (x > 0) & (x <= 250000),
-    "0.25-0.5 million": lambda x: (x > 250000) & (x <= 500000),
-    "0.5 - 1 million": lambda x: (x > 500000) & (x <= 1000000),
-    "1 million - 2 million": lambda x: (x > 1000000) & (x <= 2000000),
-    "2 million - 5 million": lambda x: (x > 2000000) & (x <= 5000000),
-    "5 million - 10 million": lambda x: (x > 5000000) & (x <= 10000000),
-    "10 million - 20 million": lambda x: (x > 10000000) & (x <= 20000000),
-    "20+ million": lambda x: x > 20000000
-}
-
+COSTS_BUCKETS = [
+    "0",
+    "0.25 million",
+    "0.5 million",
+    "1 million",
+    "2 million",
+    "5 million",
+    "10 million",
+    "20 million",
+    "20+ million"
+]
 
 VARIABLES = {
-    "💥 Incident Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
-    "🌥️ Weather": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
-    "🌫️ Visibility": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
-    "🚊 Track Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs"],
-    "🗓️ Year": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
-    "🌡️ Temperature": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
-    "🚄 Speed": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
-    
+    "💥 Incident Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🌥️ Weather": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🌫️ Visibility": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🚊 Track Type": ["Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🗓️ Year": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🌡️ Temperature": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "🚄 Speed": ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "Total People Injured", "Total People Killed"],
+    "Total People Injured" : ["Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "Total People Killed", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
+    "Total People Killed": ["Number of Accidents", "💥 Incident Type","🚄 Speed", "🌡️ Temperature", "Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
 }
 
 VARNAMES_TO_DATASET = {
@@ -130,7 +137,9 @@ VARNAMES_TO_DATASET = {
     "🌡️ Temperature" : "TEMP",
     "🇺🇸 State": "STATE",
     "💥 Incident Type": "TYPE",
-    "💸 Total Damage Costs": "ACCDMG"
+    "💸 Total Damage Costs": "ACCDMG",
+    "Total People Killed": "TOTKLD",
+    "Total People Injured": "TOTINJ"
 }
 
 
@@ -228,6 +237,66 @@ def plot_scatter(data, x_var, y_var):
     return fig
 
 
+# def plot_bubble(data, x_var, y_var):
+#     x_var_data = VARNAMES_TO_DATASET[x_var]
+#     y_var_data = VARNAMES_TO_DATASET[y_var]
+
+#     data["speed_bin"] = pd.cut(data[x_var_data], bins=np.arange(0, 135, 20))  # Adjust bin range/size
+#     data["temperature_bin"] = pd.cut(data[y_var_data], bins=np.arange(-30, 118, 10))  # Adjust bin range/size
+    
+#     binned_data = data.groupby(["speed_bin", "temperature_bin"]).size().reset_index(name="incident_count")
+#     binned_data["speed_bin"] = binned_data["speed_bin"].astype(str)
+#     binned_data["temperature_bin"] = binned_data["temperature_bin"].astype(str)
+    
+#     fig = px.scatter(
+#         binned_data,
+#         x="speed_bin",
+#         y="temperature_bin",
+#         size="incident_count",  
+#         title="Bubble Plot: Discretized Speed vs Temperature vs Number of Incidents",
+#         opacity=0.7,
+#         color_continuous_scale=px.colors.sequential.Viridis,
+#         labels={
+#             "speed_bin": "Speed (Binned)",
+#             "temperature_bin": "Temperature (Binned)",
+#             "incident_count": "Number of Incidents"
+#         }
+#     )
+#   return fig
+
+
+def parallel_plot(data, x_var, y_var):
+    x_var_data = VARNAMES_TO_DATASET[x_var]
+    y_var_data = VARNAMES_TO_DATASET[y_var]
+
+    # Quantize temperature and speed into 10 bins
+    data["temperature_bin"] = pd.cut(data[x_var_data], bins=10, precision=1, duplicates="drop")
+    data["speed_bin"] = pd.cut(data[y_var_data], bins=10, precision=1, duplicates="drop")
+
+    # Map binned intervals to numeric values for compatibility with parallel coordinates
+    data["temperature_bin_numeric"] = data["temperature_bin"].cat.codes
+    data["speed_bin_numeric"] = data["speed_bin"].cat.codes
+
+    # Parallel Coordinates Plot
+    fig = px.parallel_coordinates(
+        data,
+        dimensions=[
+            "temperature_bin_numeric",
+            "speed_bin_numeric",
+            VARNAMES_TO_DATASET["🌫️ Visibility"]
+        ],  # Include the axes
+        color=VARNAMES_TO_DATASET["🌫️ Visibility"],  # Use visibility for coloring
+        color_continuous_scale=px.colors.sequential.Viridis,
+        labels={
+            "temperature_bin_numeric": "Temperature (Binned)",
+            "speed_bin_numeric": "Speed (Binned)",
+            VARNAMES_TO_DATASET["🌫️ Visibility"]: "Visibility (miles)",
+        },
+        title="Parallel Coordinates Plot: Temperature, Speed, Visibility"
+    )
+
+    return fig
+
 
 PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
@@ -236,9 +305,29 @@ PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart,
                   ("🗓️ Year", "Number of Accidents"): plot_line_chart,
                   ("🚄 Speed", "Number of Accidents"): plot_line_chart,
                   ("🌡️ Temperature", "Number of Accidents"): plot_line_chart,
+                  ("Total People Killed", "Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS 
+                  ("Total People Injured", "Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS
                   ("🗓️ Year", "🚄 Speed"): plot_scatter,
                   ("🗓️ Year", "💸 Total Damage Costs") : plot_scatter,
+                  ("🗓️ Year", "Total People Killed") : plot_scatter,
+                  ("🗓️ Year", "Total People Injured") : plot_scatter,
+                  ("🗓️ Year", "🌡️ Temperature") : plot_scatter,
                   ("🚄 Speed", "💸 Total Damage Costs") : plot_scatter,
+                  ("🚄 Speed", "Total People Killed") : plot_scatter,
+                  ("🚄 Speed", "Total People Injured") : plot_scatter,  
+                  ("🚄 Speed", "🌡️ Temperature") : plot_scatter,
+                  ("💸 Total Damage Costs", "🚄 Speed") : plot_scatter,
+                  ("💸 Total Damage Costs", "Total People Killed") : plot_scatter,
+                  ("💸 Total Damage Costs", "Total People Injured") : plot_scatter,
+                  ("💸 Total Damage Costs", "🌡️ Temperature") : plot_scatter,
+                  ("Total People Killed", "💸 Total Damage Costs") : plot_scatter,
+                  ("Total People Killed", "🚄 Speed") : plot_scatter,
+                  ("Total People Killed", "Total People Injured") : plot_scatter,
+                  ("Total People Killed", "🌡️ Temperature") : plot_scatter,
+                  ("Total People Injured", "💸 Total Damage Costs") : plot_scatter,
+                  ("Total People Injured", "🚄 Speed") : plot_scatter,
+                  ("Total People Injured", "Total People Killed") : plot_scatter,
+                  ("Total People Injured", "🌡️ Temperature") : plot_scatter,
                   ("🚊 Track Type", "🚄 Speed"): plot_bar_chart,
                   ("🌫️ Visibility", "🚄 Speed"): plot_bar_chart,
                   ("🌥️ Weather", "🚄 Speed"): plot_bar_chart,
@@ -246,6 +335,15 @@ PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart,
                   ("🚊 Track Type", "💸 Total Damage Costs"): plot_bar_chart,
                   ("🌫️ Visibility", "💸 Total Damage Costs" ): plot_bar_chart,
                   ("🌥️ Weather", "💸 Total Damage Costs"): plot_bar_chart,
-                  ("💥 Incident Type", "💸 Total Damage Costs"): plot_bar_chart
+                  ("💥 Incident Type", "💸 Total Damage Costs"): plot_bar_chart,
+                  ("🚊 Track Type", "Total People Injured"): plot_bar_chart,
+                  ("🌫️ Visibility", "Total People Injured"): plot_bar_chart,
+                  ("🌥️ Weather", "Total People Injured"): plot_bar_chart,
+                  ("💥 Incident Type", "Total People Injured"): plot_bar_chart,
+                  ("🚊 Track Type", "Total People Killed"): plot_bar_chart,
+                  ("🌫️ Visibility", "Total People Killed"): plot_bar_chart,
+                  ("🌥️ Weather", "Total People Killed"): plot_bar_chart,
+                  ("💥 Incident Type", "Total People Killed"): plot_bar_chart,
+                  ("test"): parallel_plot,
 
 }
