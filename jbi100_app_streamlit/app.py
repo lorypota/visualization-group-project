@@ -1,6 +1,6 @@
 import streamlit as st
 from filters import setup_filters
-from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event, update_bottom_panel
+from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event,  simple_graph, parallel_coord_plot
 from styles import CSS_STYLE
 from config import VARIABLES, PLOT_FUNCTIONS
 import plotly.express as px
@@ -12,7 +12,7 @@ st.markdown(CSS_STYLE, unsafe_allow_html=True)
 st.sidebar.write("<div style='text-align:center;'><h1>RailAlert!</h1></div>", unsafe_allow_html=True)
 col1, col2, col3 = st.sidebar.columns([1, 2, 1])
 with col2:
-    st.image("jbi100_app_streamlit/assets/RailAlertLogoNoBckg.png", use_container_width=True)
+    st.image("jbi100_app_streamlit/assets/RailAlertLogoNoBckg.png", use_column_width=True)
 
 def main():
     initialize_data()
@@ -64,9 +64,63 @@ def main():
             if selected_variable and second_selected_var:
                 key = (selected_variable, second_selected_var)
                 if key in PLOT_FUNCTIONS:
-                    update_bottom_panel(key, selected_filter, selected_variable, second_selected_var)
+                    simple_graph(key, selected_filter, selected_variable, second_selected_var)
                 else:
                     st.write("No predefined plot available for this selection.")
+
+        padding_left3, container3, padding_right3 = st.columns([0.02, 1, 0.02], gap="large")
+
+        with container3:
+            st.write("")
+            st.write("")
+
+            box3, box4, box5, box6 = st.columns([1, 1, 1, 1])  
+
+            parallel_plot_variables = ["🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
+                                       "🪨 Weight (Tons)", "Total People Injured", "Total People Killed"]
+            
+            with box3:
+                par_plot_var_1 = st.selectbox(
+                    "First variable",
+                    options=parallel_plot_variables
+                )
+
+            with box4:
+                par_plot_var_2 = None
+                if par_plot_var_1:
+                    par_plot_var_2 = st.selectbox(
+                        "Second variable",
+                        options=parallel_plot_variables
+                    )
+
+            with box5:
+                par_plot_var_3 = None
+                if par_plot_var_2:
+                    par_plot_var_3 = st.selectbox(
+                        "Third variable",
+                        options=parallel_plot_variables
+                    )
+
+            with box6:
+                par_plot_var_4 = None
+                if par_plot_var_3:
+                    par_plot_var_4 = st.selectbox(
+                        "Fourth variable",
+                        options=parallel_plot_variables
+                    )
+
+
+        padding_left4, container4, padding_right4 = st.columns([0.05, 1, 0.05], gap="medium")
+        par_plot_vars = [par_plot_var_1, par_plot_var_2, par_plot_var_3, par_plot_var_4]
+        vars_set = set(par_plot_vars)
+
+        with container4:
+            st.write("")
+            if len(vars_set) >= 2:
+                parallel_coord_plot(selected_filter, par_plot_vars)
+            else:
+                st.write("Please select at least two distinct variables to display the parallel coordinate plot.")
+
 
 
 if __name__ == "__main__":

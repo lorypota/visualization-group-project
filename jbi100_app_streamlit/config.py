@@ -139,7 +139,8 @@ VARNAMES_TO_DATASET = {
     "💥 Incident Type": "TYPE",
     "💸 Total Damage Costs": "ACCDMG",
     "Total People Killed": "TOTKLD",
-    "Total People Injured": "TOTINJ"
+    "Total People Injured": "TOTINJ",
+    "🪨 Weight (Tons)": "TONS"
 }
 
 
@@ -265,38 +266,58 @@ def plot_scatter(data, x_var, y_var):
 #   return fig
 
 
-def parallel_plot(data, x_var, y_var):
-    x_var_data = VARNAMES_TO_DATASET[x_var]
-    y_var_data = VARNAMES_TO_DATASET[y_var]
+def make_bins(var, data, dims, labs):
+    if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight (Tons)"]:
+        if var == "🌡️ Temperature":
+            name = "temperature_bin"
+        elif var == "🚄 Speed":
+            name = "speed_bin"
+        elif var == "💸 Total Damage Costs":
+            name = "costs_bin"
+        elif var == "🪨 Weight (Tons)":
+            name = "weight_bin"
+        name_numeric = name + "_numeric"
+        labs[name_numeric] = var
 
-    # Quantize temperature and speed into 10 bins
-    data["temperature_bin"] = pd.cut(data[x_var_data], bins=10, precision=1, duplicates="drop")
-    data["speed_bin"] = pd.cut(data[y_var_data], bins=10, precision=1, duplicates="drop")
+        var = VARNAMES_TO_DATASET[var]
+        data[name] = pd.cut(data[var], bins=10, precision=1, duplicates="drop")
+        data[name_numeric] = data[name].cat.codes 
 
-    # Map binned intervals to numeric values for compatibility with parallel coordinates
-    data["temperature_bin_numeric"] = data["temperature_bin"].cat.codes
-    data["speed_bin_numeric"] = data["speed_bin"].cat.codes
+        dims.append(name_numeric)
+    else:
+        labs[VARNAMES_TO_DATASET[var]] = var
+        var = VARNAMES_TO_DATASET[var]
+        dims.append(var)
+        name = var
+    
+    # Calculate the bin counts and assign them to a new column
+    bin_counts = data[name].value_counts()
+    data[f"{name}_count"] = data[name].map(bin_counts)
+    return f"{name}_count"
 
-    # Parallel Coordinates Plot
+def parallel_plot(data, selected_vars):
+
+    dims = []
+    labs = {}
+
+    color_column = None
+    for var in selected_vars:
+        color_column = make_bins(var, data, dims, labs)
+    
     fig = px.parallel_coordinates(
         data,
-        dimensions=[
-            "temperature_bin_numeric",
-            "speed_bin_numeric",
-            VARNAMES_TO_DATASET["🌫️ Visibility"]
-        ],  # Include the axes
-        color=VARNAMES_TO_DATASET["🌫️ Visibility"],  # Use visibility for coloring
-        color_continuous_scale=px.colors.sequential.Viridis,
-        labels={
-            "temperature_bin_numeric": "Temperature (Binned)",
-            "speed_bin_numeric": "Speed (Binned)",
-            VARNAMES_TO_DATASET["🌫️ Visibility"]: "Visibility (miles)",
-        },
-        title="Parallel Coordinates Plot: Temperature, Speed, Visibility"
+        dimensions = dims,
+        color=color_column,
+        color_continuous_scale=px.colors.sequential.Hot,
+        labels=labs,
+        title=" "
+    )
+
+    fig.update_layout(
+        margin=dict(l=50, r=50, t=50, b=50),  
     )
 
     return fig
-
 
 PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
@@ -343,7 +364,5 @@ PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart,
                   ("🚊 Track Type", "Total People Killed"): plot_bar_chart,
                   ("🌫️ Visibility", "Total People Killed"): plot_bar_chart,
                   ("🌥️ Weather", "Total People Killed"): plot_bar_chart,
-                  ("💥 Incident Type", "Total People Killed"): plot_bar_chart,
-                  ("test"): parallel_plot,
-
+                  ("💥 Incident Type", "Total People Killed"): plot_bar_chart
 }

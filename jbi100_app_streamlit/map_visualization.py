@@ -3,7 +3,7 @@ import plotly.express as px
 import pandas as pd
 import json
 from datetime import date
-from config import MAPBOX_ACCESS_TOKEN, MAP_CONFIGS, DATA_PATH, DEFAULT_STYLE, PLOT_FUNCTIONS, STATE_CODES, TRACK_DESCRIPTIONS, TYPE_DESCRIPTIONS, VARNAMES_TO_DATASET, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS
+from config import *
 
 selected_data = None
 unselected_data = None
@@ -55,7 +55,6 @@ def map(fig, data, selected_filter):
     )
     selected_markers = json.dumps(selected_markers)
     
-
     if selected_markers:
         # Extract latitudes and longitudes from selected_markers
         selection = json.loads(selected_markers)['selection']
@@ -190,8 +189,6 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
         )
     
     
-
-
 def check_single_event():
     global selected_data
     
@@ -210,7 +207,6 @@ def check_single_event():
             
             # Extract the single row of data
             accident_data = selected_data.iloc[0]
-        
             
             # Location Information
             with col1:
@@ -254,7 +250,7 @@ def check_single_event():
             
             # Display Narration
             st.subheader("Accident Description")
-            st.write(f"**Narration:** {accident_data['NARR']}")
+            st.write(f"{accident_data['NARR']}")
             st.write("")
         return True
     
@@ -346,20 +342,13 @@ def bar_callback():
         print(f"TYPE column dtype: {data[x_var_col].dtype}")
 
 
-
-           
-    
-    
-        
-def update_bottom_panel(key, selected_filter, selected_variable, second_selected_var): 
+def simple_graph(key, selected_filter, selected_variable, second_selected_var):
     st.session_state.callback_data['selected_markers'] = []
-    
     if key in PLOT_FUNCTIONS:
         global selected_data
         global unselected_data
         selected_data_copy = st.session_state.callback_data.get('selected_data_back', [])
         unselected_data_copy = st.session_state.callback_data.get('unselected_data_back', [])
-        print("about to UPDATE bottom panel")
         
         # Check if selected_variable_back and selected_variable are different
         selected_variable_back = st.session_state.callback_data.get('selected_variable_back', None)
@@ -368,9 +357,9 @@ def update_bottom_panel(key, selected_filter, selected_variable, second_selected
         if selected_variable_back != selected_variable or second_selected_var_back != second_selected_var:
             st.session_state.callback_data['selected_data_back'] = []
             st.session_state.callback_data['unselected_data_back'] = []
-            print("Something")
-        
+
         plot_func = PLOT_FUNCTIONS[key]
+        
         fig = None
         
         # Check if selected_data_back is available, otherwise use selected_data, and then map_data
@@ -385,17 +374,17 @@ def update_bottom_panel(key, selected_filter, selected_variable, second_selected
         
         # Use the selected data (or map_data) for plotting
         fig = plot_func(data_to_use, selected_variable, second_selected_var)
-        
-        # Display the plot
         st.plotly_chart(fig, on_select=bar_callback, key="bottom_panel", use_container_width=True)        
     else:
         st.write("No predefined plot available for this selection.")
 
-    # WIP
-    funct = PLOT_FUNCTIONS["test"]
-    if len(selected_data) == 0:
-            selected_data = st.session_state.map_data[selected_filter].copy()
-    parallel_fig = funct(selected_data, "🌡️ Temperature", "🚄 Speed")
-    st.plotly_chart(parallel_fig, use_container_width=True)
 
-    
+def parallel_coord_plot(selected_filter, par_plot_vars):
+    global selected_data
+
+    if len(selected_data) == 0:
+        selected_data = st.session_state.map_data[selected_filter].copy()
+
+    parallel_fig = parallel_plot(selected_data, par_plot_vars)
+    st.plotly_chart(parallel_fig, use_container_width=True)
+ 
