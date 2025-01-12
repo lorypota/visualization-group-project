@@ -138,7 +138,7 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
             lat=selected_markers["Latitude"].tolist(),
             lon=selected_markers["Longitude"].tolist(),
             mode='markers',
-            marker=dict(size=6, opacity=0.8, color='blue'),
+            marker=dict(size=6, opacity=0.8, color='yellow'),
             selected=dict(marker=marker_properties_unselected()),
             unselected=dict(marker=marker_properties_unselected()),
             hovertext=(
