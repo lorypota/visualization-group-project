@@ -378,12 +378,12 @@ def simple_graph(key, selected_filter, selected_variable, second_selected_var): 
         st.write("No predefined plot available for this selection.")
 
 
-def parallel_coord_plot(selected_filter, par_plot_vars):
+def parallel_coord_plot(selected_filter, par_plot_vars, binning):
     global selected_data
 
     if len(selected_data) == 0:
         selected_data = st.session_state.map_data[selected_filter].copy()
 
-    parallel_fig = parallel_plot(selected_data, par_plot_vars)
+    parallel_fig = parallel_plot(selected_data, par_plot_vars, binning)
     st.plotly_chart(parallel_fig, use_container_width=True)
  

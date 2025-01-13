@@ -1,3 +1,5 @@
+
+
 import streamlit as st
 from filters import setup_filters
 from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event,  simple_graph, parallel_coord_plot
@@ -5,7 +7,7 @@ from styles import CSS_STYLE
 from config import VARIABLES, PLOT_FUNCTIONS
 import plotly.express as px
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_icon="🚆", page_title="RailAlert!")
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 
 # Name and logo
@@ -80,7 +82,7 @@ def main():
                                        "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "🤕 Total People Injured", "🪦 Total People Killed"]
             
             parallel_plot_variables2 = ["-- empty --", "🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
-                                        "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "🤕 Total People Injured", "🪦 Total People Killed"]
+                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "🤕 Total People Injured", "🪦 Total People Killed"]
             
             with box3:
                 par_plot_var_1 = st.selectbox(
@@ -115,20 +117,22 @@ def main():
                         options=parallel_plot_variables2,
                         index=4
                     )
-                
-
+            
 
         padding_left4, container4, padding_right4 = st.columns([0.05, 1, 0.05], gap="medium")
         par_plot_vars = [par_plot_var_1, par_plot_var_2, par_plot_var_3, par_plot_var_4]
         vars_set = set(par_plot_vars)
 
+        padding_left5, container5, padding_right5 = st.columns([3, 1, 2], gap="large")
+        with container5:
+            binning_toggle = st.checkbox("Enable Binning", value=True)
+
         with container4:
             st.write("")
             if len(vars_set) >= 2:
-                parallel_coord_plot(selected_filter, par_plot_vars)
+                parallel_coord_plot(selected_filter, par_plot_vars, binning_toggle)
             else:
                 st.write("Please select at least two distinct variables to display the parallel coordinate plot.")
-
 
 if __name__ == "__main__":
     main()

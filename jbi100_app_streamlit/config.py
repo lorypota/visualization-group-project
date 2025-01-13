@@ -15,7 +15,7 @@ DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
 STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu" # currently not used
 
 # File paths
-DATA_PATH = 'Railroad_Incidents_Data/CleanedDataset.csv'
+DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
 
 # Map configurations
 MAP_CONFIGS = {
@@ -125,12 +125,12 @@ VARIABLES = {
     "🗓️ Year": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
     "🌡️ Temperature": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
     "🚄 Speed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🤕 Total People Injured": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🪦 Total People Killed", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
-    "🪦 Total People Killed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
+    "🤕 Total People Injured" : ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🪦 Total People Killed", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
+    "🪦 Total People Killed": ["🔢 Number of Accidents", "💥 Incident Type","🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
 }
 
 VARNAMES_TO_DATASET = {
-    "🔢 Number of Accidents": "Number of Accidents",
+    "🔢 Number of Accidents": "🔢 Number of Accidents" ,
     "🌥️ Weather": "WEATHER",
     "🌫️ Visibility": "VISIBLTY",
     "🚊 Track Type": "TYPTRK",
@@ -170,7 +170,7 @@ def plot_bar_chart(data, categorical_var, numerical_var):
     ]   
         
     # Group the data by the categorical variable
-    if num_var_data == "Number of Accidents":
+    if num_var_data == "🔢 Number of Accidents":
         grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
     else:
         
@@ -182,9 +182,9 @@ def plot_bar_chart(data, categorical_var, numerical_var):
     fig = px.bar(
         grouped_data,
         x=selected_type_description,
-        y='Counts' if num_var_data == "Number of Accidents" else num_var_data,
+        y='Counts' if num_var_data == "🔢 Number of Accidents" else num_var_data,
         title=f"{categorical_var} vs {numerical_var}",
-        labels={cat_var_data: categorical_var, 'Counts': 'Number of Accidents' if num_var_data == "Number of Accidents" else num_var_data}
+        labels={cat_var_data: categorical_var, 'Counts': '🔢 Number of Accidents' if num_var_data == "🔢 Number of Accidents" else num_var_data}
     )
     
     # Add custom data (latitude and longitude) to each bar
@@ -198,15 +198,15 @@ def plot_line_chart(data, x_var, y_var):
     x_var_data = VARNAMES_TO_DATASET[x_var]
     y_var_data = VARNAMES_TO_DATASET[y_var]
     
-    if y_var_data == "Number of Accidents":
+    if y_var_data == "🔢 Number of Accidents":
         grouped_data = data.groupby(x_var_data).size().reset_index(name='Counts')
         fig = px.line(
             grouped_data,
             x=x_var_data,
             y='Counts',
-            title=f"{x_var} vs Number of Accidents",
+            title=f"{x_var} vs 🔢 Number of Accidents",
             markers=True,
-            labels={x_var_data: x_var, 'Counts': 'Number of Accidents'}
+            labels={x_var_data: x_var, 'Counts': '🔢 Number of Accidents'}
         )
     else:
         grouped_data = data.groupby(x_var_data)[y_var_data].mean().reset_index()
@@ -242,45 +242,57 @@ def plot_scatter(data, x_var, y_var):
     return fig
 
 
-def make_bins(var, data, dims, labs):
+def make_bins(var, data, dims, labs, binning):
     if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight"]:
         # Define bin names and units
+        non_negative = False
         if var == "🌡️ Temperature":
             name = "temperature_bin"
             unit = "°F"
         elif var == "🚄 Speed":
             name = "speed_bin"
             unit = "mph"
+            non_negative = True
         elif var == "💸 Total Damage Costs":
             name = "costs_bin"
             unit = "$"
+            non_negative = True
         elif var == "🪨 Weight":
             name = "weight_bin"
             unit = "tons"
+            non_negative = True
 
         name_numeric = name + "_numeric"
         labs[name_numeric] = var
 
-        # Avoid recreating columns if they already exist
-        if name not in data.columns or name_numeric not in data.columns:
-            var_column = VARNAMES_TO_DATASET[var]
+        var_column = VARNAMES_TO_DATASET[var]
+        data[name] = pd.cut(data[var_column], bins=10, precision=1, duplicates="drop")
+        data[name_numeric] = data[name].cat.codes
 
-            # Create bins and assign numeric codes
-            data[name] = pd.cut(data[var_column], bins=10, precision=1, duplicates="drop")
-            data[name_numeric] = data[name].cat.codes
-
-            # Create bin counts for coloring or further analysis
-            bin_counts = data[name].value_counts()
-            data[f"{name}_count"] = data[name].map(bin_counts)
+        bin_counts = data[name].value_counts()
+        data[f"{name}_count"] = data[name].map(bin_counts)
+    
+        if non_negative:
+            ticktext = [str(interval) for interval in data[name].cat.categories]
+            tokens = ticktext[0].split(",")
+            tokens[0] = "(0.0"
+            new_interval = ",".join(tokens)
+            ticktext[0] = new_interval
         else:
-            return
+            ticktext = [str(interval) for interval in data[name].cat.categories]
 
-        dims.append({
-            "label": f"{var} ({unit})",
-            "values": data[name_numeric],
-            "tickvals": list(range(len(data[name].cat.categories))),
-            "ticktext": [str(interval) for interval in data[name].cat.categories]
-        })
+        if binning:
+            dims.append({
+                "label": f"{var} ({unit})",
+                "values": data[name_numeric],
+                "tickvals": list(range(len(data[name].cat.categories))),
+                "ticktext": ticktext
+            })
+        else:
+            dims.append({
+                "label": f"{var} ({unit})",
+                "values": data[var_column]
+            })
 
         return name_numeric
     else:
@@ -316,55 +328,55 @@ def make_bins(var, data, dims, labs):
         return None
     
     
-def parallel_plot(data, selected_vars):
+import plotly.graph_objects as go
+
+def parallel_plot(data, selected_vars, binning):
     dims = []
     labs = {}
 
-    # Collect all bin columns
-    bin_columns = []
     for var in selected_vars:
         if var != "-- empty --":
-            bin_column = make_bins(var, data, dims, labs)
-            if bin_column is not None:
-                bin_columns.append(bin_column)
+            make_bins(var, data, dims, labs, binning)
 
-    # Calculate the count of entries collapsing into each combination of bins
-    if "combination_count" not in data.columns:
-        grouped = data.groupby(bin_columns).size().reset_index(name="combination_count")
-        data = data.merge(grouped, on=bin_columns, how="left")
+    # Determine the first variable for coloring
+    if selected_vars and selected_vars[0] != "-- empty --":
+        first_var = selected_vars[0]
+        color_column = VARNAMES_TO_DATASET[first_var]  # Map the variable to the dataset column
+    else:
+        color_column = None
 
     # Create the parallel coordinates plot
     fig = go.Figure(data=go.Parcoords(
         line=dict(
-            color=data["combination_count"],  # Color based on the number of entries
-            colorscale="Viridis",
-            showscale=True,
-            cmin=data["combination_count"].min(),
-            cmax=data["combination_count"].max(),
-            colorbar=dict(title="# of Entries"),
+            color=data[color_column] if color_column else [0] * len(data),  # Default to black if no variable
+            colorscale="Viridis",  
+            showscale=True,  # Show the color bar
+            cmin=data[color_column].min() if color_column else 0,
+            cmax=data[color_column].max() if color_column else 1,
+            colorbar=dict(
+                title=f"{first_var} (Scale)",  # Dynamic colorbar title
+                tickfont=dict(size=12, color="black"),
+                titlefont=dict(size=14, color="black")
+            )
         ),
         dimensions=dims,
-        labelfont=dict(family="Courier New Bold", size=14, color="black"),
-        tickfont=dict(family="Courier New Bold", size=12, color="black")
+        labelfont=dict(size=14, color="black"),
+        tickfont=dict(size=12, color="black")
     ))
 
-    # Customize layout
-    fig.update_layout(
-        margin=dict(l=100, r=50, t=50, b=50)
-    )
-
-    return fig 
+    fig.update_layout(margin=dict(l=100, r=50, t=50, b=50))
+    return fig
  
 
-PLOT_FUNCTIONS = {("🌥️ Weather", "🔢 Number of Accidents"): plot_bar_chart,
+PLOT_FUNCTIONS = { ("🌥️ Weather", "🔢 Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "🔢 Number of Accidents"): plot_bar_chart,
                   ("🚊 Track Type", "🔢 Number of Accidents"): plot_bar_chart,
                   ("💥 Incident Type", "🔢 Number of Accidents"): plot_bar_chart,
                   ("🗓️ Year", "🔢 Number of Accidents"): plot_line_chart,
                   ("🚄 Speed", "🔢 Number of Accidents"): plot_line_chart,
-                  ("🌡️ Temperature", "🔢 Number of Accidents"): plot_line_chart, # NOT COMPLETELY CONTINUOUS
-                  ("🪦 Total People Killed", "🔢 Number of Accidents"): plot_line_chart, # NOT COMPLETELY CONTINUOUS
-                  ("🤕 Total People Injured", "🔢 Number of Accidents"): plot_line_chart,
+                  ("🌡️ Temperature", "🔢 Number of Accidents"): plot_line_chart,
+                  ("🪦 Total People Killed", "🔢 Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS 
+                  ("🤕 Total People Injured", "🔢 Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS
                   ("🗓️ Year", "🚄 Speed"): plot_scatter,
                   ("🗓️ Year", "💸 Total Damage Costs") : plot_scatter,
                   ("🗓️ Year", "🪦 Total People Killed") : plot_scatter,
