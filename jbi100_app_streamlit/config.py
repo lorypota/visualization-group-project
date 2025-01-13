@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
+
 # Load environment variables
 load_dotenv()
 MAPBOX_ACCESS_TOKEN = os.getenv('MAPBOX_TOKEN')
@@ -140,7 +142,9 @@ VARNAMES_TO_DATASET = {
     "💸 Total Damage Costs": "ACCDMG",
     "Total People Killed": "TOTKLD",
     "Total People Injured": "TOTINJ",
-    "🪨 Weight (Tons)": "TONS"
+    "🪨 Weight": "TONS",
+    "🍷 Alcohol": "ALCOHOL", 
+    "💉 Drugs": "DRUG"
 }
 
 
@@ -238,86 +242,119 @@ def plot_scatter(data, x_var, y_var):
     return fig
 
 
-# def plot_bubble(data, x_var, y_var):
-#     x_var_data = VARNAMES_TO_DATASET[x_var]
-#     y_var_data = VARNAMES_TO_DATASET[y_var]
-
-#     data["speed_bin"] = pd.cut(data[x_var_data], bins=np.arange(0, 135, 20))  # Adjust bin range/size
-#     data["temperature_bin"] = pd.cut(data[y_var_data], bins=np.arange(-30, 118, 10))  # Adjust bin range/size
-    
-#     binned_data = data.groupby(["speed_bin", "temperature_bin"]).size().reset_index(name="incident_count")
-#     binned_data["speed_bin"] = binned_data["speed_bin"].astype(str)
-#     binned_data["temperature_bin"] = binned_data["temperature_bin"].astype(str)
-    
-#     fig = px.scatter(
-#         binned_data,
-#         x="speed_bin",
-#         y="temperature_bin",
-#         size="incident_count",  
-#         title="Bubble Plot: Discretized Speed vs Temperature vs Number of Incidents",
-#         opacity=0.7,
-#         color_continuous_scale=px.colors.sequential.Viridis,
-#         labels={
-#             "speed_bin": "Speed (Binned)",
-#             "temperature_bin": "Temperature (Binned)",
-#             "incident_count": "Number of Incidents"
-#         }
-#     )
-#   return fig
-
-
 def make_bins(var, data, dims, labs):
-    if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight (Tons)"]:
+    if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight"]:
+        # Define bin names and units
         if var == "🌡️ Temperature":
             name = "temperature_bin"
+            unit = "°F"
         elif var == "🚄 Speed":
             name = "speed_bin"
+            unit = "mph"
         elif var == "💸 Total Damage Costs":
             name = "costs_bin"
-        elif var == "🪨 Weight (Tons)":
+            unit = "$"
+        elif var == "🪨 Weight":
             name = "weight_bin"
+            unit = "tons"
+
         name_numeric = name + "_numeric"
         labs[name_numeric] = var
 
-        var = VARNAMES_TO_DATASET[var]
-        data[name] = pd.cut(data[var], bins=10, precision=1, duplicates="drop")
-        data[name_numeric] = data[name].cat.codes 
+        # Avoid recreating columns if they already exist
+        if name not in data.columns or name_numeric not in data.columns:
+            var_column = VARNAMES_TO_DATASET[var]
 
-        dims.append(name_numeric)
+            # Create bins and assign numeric codes
+            data[name] = pd.cut(data[var_column], bins=10, precision=1, duplicates="drop")
+            data[name_numeric] = data[name].cat.codes
+
+            # Create bin counts for coloring or further analysis
+            bin_counts = data[name].value_counts()
+            data[f"{name}_count"] = data[name].map(bin_counts)
+        else:
+            return
+
+        dims.append({
+            "label": f"{var} ({unit})",
+            "values": data[name_numeric],
+            "tickvals": list(range(len(data[name].cat.categories))),
+            "ticktext": [str(interval) for interval in data[name].cat.categories]
+        })
+
+        return name_numeric
     else:
         labs[VARNAMES_TO_DATASET[var]] = var
-        var = VARNAMES_TO_DATASET[var]
-        dims.append(var)
-        name = var
+        var_column = VARNAMES_TO_DATASET[var]
+
+        if var == "🍷 Alcohol":
+            dims.append({
+                "label": f"{var} (# of positive tests)",
+                "values": data[var_column],
+                "tickvals": [-1, 0, 1],
+                "ticktext": ["No data", "0", "1"]
+            })
+        elif var == "💉 Drugs":
+            dims.append({
+                "label": f"{var} (# of positive tests)",
+                "values": data[var_column],
+                "tickvals": [-1, 0, 1, 2, 3],
+                "ticktext": ["No data", "0", "1", "2", "3"]
+            })
+        elif var == "🚊 Track Type":
+            dims.append({
+                "label": var,
+                "values": data[var_column],
+                "tickvals": [1, 2, 3, 4],
+                "ticktext": ["Main", "Yard", "Siding", "Industry"]
+            })
+        else:
+            dims.append({
+                "label": var,
+                "values": data[var_column]
+            })
+        return None
     
-    # Calculate the bin counts and assign them to a new column
-    bin_counts = data[name].value_counts()
-    data[f"{name}_count"] = data[name].map(bin_counts)
-    return f"{name}_count"
-
+    
 def parallel_plot(data, selected_vars):
-
     dims = []
     labs = {}
 
-    color_column = None
+    # Collect all bin columns
+    bin_columns = []
     for var in selected_vars:
-        color_column = make_bins(var, data, dims, labs)
-    
-    fig = px.parallel_coordinates(
-        data,
-        dimensions = dims,
-        color=color_column,
-        color_continuous_scale=px.colors.sequential.Hot,
-        labels=labs,
-        title=" "
-    )
+        if var != "-- empty --":
+            bin_column = make_bins(var, data, dims, labs)
+            if bin_column is not None:
+                bin_columns.append(bin_column)
 
+    # Calculate the count of entries collapsing into each combination of bins
+    if "combination_count" not in data.columns:
+        grouped = data.groupby(bin_columns).size().reset_index(name="combination_count")
+        data = data.merge(grouped, on=bin_columns, how="left")
+
+    # Create the parallel coordinates plot
+    fig = go.Figure(data=go.Parcoords(
+        line=dict(
+            color=data["combination_count"],  # Color based on the number of entries
+            colorscale="Viridis",
+            showscale=True,
+            cmin=data["combination_count"].min(),
+            cmax=data["combination_count"].max(),
+            colorbar=dict(title="# of Entries"),
+        ),
+        dimensions=dims,
+        labelfont=dict(family="Courier New Bold", size=14, color="black"),
+        tickfont=dict(family="Courier New Bold", size=12, color="black")
+    ))
+
+    # Customize layout
     fig.update_layout(
-        margin=dict(l=50, r=50, t=50, b=50),  
+        margin=dict(l=100, r=50, t=50, b=50)
     )
 
-    return fig
+    return fig 
+ 
 
 PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
