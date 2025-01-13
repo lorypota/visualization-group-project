@@ -77,10 +77,10 @@ def main():
             box3, box4, box5, box6 = st.columns([1, 1, 1, 1])  
 
             parallel_plot_variables = ["🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
-                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "Total People Injured", "Total People Killed"]
+                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "🤕 Total People Injured", "🪦 Total People Killed"]
             
             parallel_plot_variables2 = ["-- empty --", "🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
-                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "Total People Injured", "Total People Killed"]
+                                        "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "🤕 Total People Injured", "🪦 Total People Killed"]
             
             with box3:
                 par_plot_var_1 = st.selectbox(
