@@ -7,7 +7,8 @@
 Notebooks/
 
 # Dataset
-Railroad_Incidents/*
+Railroad_Incidents_Data/CleanedDataset.csv
+Railroad_Incidents_Data/Dataset.csv
 
 # Codealike
 codealike.json
@@ -221,7 +222,4 @@ Railroad Incidents/Railroad_Equipment_Accident_Incident_Source_Data__Form_54__20
 jbi100_app_dash/Railroad_Incidents/CleanedDataset.csv
 jbi100_app_dash/Railroad_Incidents/dataset.csv
 jbi100_app_dash/Railroad_Incidents/readme.txt
-jbi100_app_dash/clean_dataset.py
-jbi100_app_dash/clean_dataset.py
-jbi100_app_dash/clean_dataset.py
 jbi100_app_streamlit/hanna_tests
