@@ -142,6 +142,12 @@ def format_columns(df):
     return df
 
 
+def replace_alcohol_drug_nan(df):
+    df['DRUG'] = df['DRUG'].fillna(-1)
+    df['ALCOHOL'] = df['ALCOHOL'].fillna(-1)
+    return df
+
+
 def create_datetime_column(df):
     """Creates a datetime type column to have all time info in one place, also allowing sorting of the dataset by incident time."""
 
@@ -177,6 +183,7 @@ def drop_0_coord_entries(df):
     Drops all entries where coordinates are 0,0.
     """
     return df[(df['Latitude'] != 0) & (df['Longitude'] != 0)].copy()
+
 
 def sanity_checks(df):
     """
@@ -216,6 +223,7 @@ df_railroad=create_datetime_column(df_railroad)
 if DROP_0_COORD:
     df_railroad=drop_0_coord_entries(df_railroad)
 df_railroad = sanity_checks(df_railroad)    
+df_railroad = replace_alcohol_drug_nan(df_railroad)
 dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
 

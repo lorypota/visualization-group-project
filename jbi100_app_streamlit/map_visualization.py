@@ -131,7 +131,6 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
         )
         
         # Add scattermapbox for selected markers
-            
         print("selected markers.....")
         selected_markers['DATETIME'] = pd.to_datetime(selected_markers['DATETIME'], errors='coerce')
         fig.add_scattermapbox(
@@ -342,7 +341,7 @@ def bar_callback():
         print(f"TYPE column dtype: {data[x_var_col].dtype}")
 
 
-def simple_graph(key, selected_filter, selected_variable, second_selected_var):
+def simple_graph(key, selected_filter, selected_variable, second_selected_var):   # ex update_bottom_panel
     st.session_state.callback_data['selected_markers'] = []
     if key in PLOT_FUNCTIONS:
         global selected_data

@@ -77,12 +77,16 @@ def main():
             box3, box4, box5, box6 = st.columns([1, 1, 1, 1])  
 
             parallel_plot_variables = ["🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
-                                       "🪨 Weight (Tons)", "Total People Injured", "Total People Killed"]
+                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "Total People Injured", "Total People Killed"]
+            
+            parallel_plot_variables2 = ["-- empty --", "🌡️ Temperature", "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs",
+                                       "🪨 Weight", "🍷 Alcohol", "💉 Drugs", "Total People Injured", "Total People Killed"]
             
             with box3:
                 par_plot_var_1 = st.selectbox(
                     "First variable",
-                    options=parallel_plot_variables
+                    options=parallel_plot_variables,
+                    index=0
                 )
 
             with box4:
@@ -90,7 +94,8 @@ def main():
                 if par_plot_var_1:
                     par_plot_var_2 = st.selectbox(
                         "Second variable",
-                        options=parallel_plot_variables
+                        options=parallel_plot_variables,
+                        index=1
                     )
 
             with box5:
@@ -98,7 +103,8 @@ def main():
                 if par_plot_var_2:
                     par_plot_var_3 = st.selectbox(
                         "Third variable",
-                        options=parallel_plot_variables
+                        options=parallel_plot_variables2,
+                        index=3
                     )
 
             with box6:
@@ -106,8 +112,10 @@ def main():
                 if par_plot_var_3:
                     par_plot_var_4 = st.selectbox(
                         "Fourth variable",
-                        options=parallel_plot_variables
+                        options=parallel_plot_variables2,
+                        index=4
                     )
+                
 
 
         padding_left4, container4, padding_right4 = st.columns([0.05, 1, 0.05], gap="medium")
@@ -120,7 +128,6 @@ def main():
                 parallel_coord_plot(selected_filter, par_plot_vars)
             else:
                 st.write("Please select at least two distinct variables to display the parallel coordinate plot.")
-
 
 
 if __name__ == "__main__":
