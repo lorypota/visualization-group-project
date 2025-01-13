@@ -356,15 +356,15 @@ def parallel_plot(data, selected_vars):
     return fig 
  
 
-PLOT_FUNCTIONS = { ("🌥️ Weather", "Number of Accidents"): plot_bar_chart, 
-                  ("🌫️ Visibility", "Number of Accidents"): plot_bar_chart,
-                  ("🚊 Track Type", "Number of Accidents"): plot_bar_chart,
-                  ("💥 Incident Type", "Number of Accidents"): plot_bar_chart,
-                  ("🗓️ Year", "Number of Accidents"): plot_line_chart,
-                  ("🚄 Speed", "Number of Accidents"): plot_line_chart,
-                  ("🌡️ Temperature", "Number of Accidents"): plot_line_chart,
-                  ("🪦 Total People Killed", "Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS 
-                  ("🤕 Total People Injured", "Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS
+PLOT_FUNCTIONS = {("🌥️ Weather", "🔢 Number of Accidents"): plot_bar_chart,
+                  ("🌫️ Visibility", "🔢 Number of Accidents"): plot_bar_chart,
+                  ("🚊 Track Type", "🔢 Number of Accidents"): plot_bar_chart,
+                  ("💥 Incident Type", "🔢 Number of Accidents"): plot_bar_chart,
+                  ("🗓️ Year", "🔢 Number of Accidents"): plot_line_chart,
+                  ("🚄 Speed", "🔢 Number of Accidents"): plot_line_chart,
+                  ("🌡️ Temperature", "🔢 Number of Accidents"): plot_line_chart, # NOT COMPLETELY CONTINUOUS
+                  ("🪦 Total People Killed", "🔢 Number of Accidents"): plot_line_chart, # NOT COMPLETELY CONTINUOUS
+                  ("🤕 Total People Injured", "🔢 Number of Accidents"): plot_line_chart,
                   ("🗓️ Year", "🚄 Speed"): plot_scatter,
                   ("🗓️ Year", "💸 Total Damage Costs") : plot_scatter,
                   ("🗓️ Year", "🪦 Total People Killed") : plot_scatter,
