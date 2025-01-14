@@ -274,6 +274,7 @@ VARNAMES_TO_DATASET = {
     "🌥️ Weather": "WEATHER",
     "🌫️ Visibility": "VISIBLTY",
     "🚊 Track Type": "TYPTRK",
+    "🛤️ Track Class": "TRKCLAS",
     "🗓️ Date": "DATETIME",
     "🚄 Speed": "TRNSPD",
     "🌡️ Temperature": "TEMP",
