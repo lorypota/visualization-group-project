@@ -95,6 +95,8 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
         print("I AM HERE !!")
         selected_data_copy = st.session_state.callback_data.get('selected_data_back', [])
         unselected_data_copy = st.session_state.callback_data.get('unselected_data_back', [])
+        selected_data_copy = selected_data_copy[selected_filter]
+        # unselected_data_copy = data[~selected_filter]
         
         # Add the unselected trace first
         fig.add_scattermapbox(
@@ -363,8 +365,8 @@ def simple_graph(key, selected_filter, selected_variable, second_selected_var): 
         
         # Check if selected_data_back is available, otherwise use selected_data, and then map_data
         if len(selected_data_copy) > 0:
-            selected_data = selected_data_copy[selected_filter].copy()
-            unselected_data = unselected_data_copy[selected_filter].copy()
+            selected_data = selected_data_copy
+            unselected_data = unselected_data_copy        
         
         if selected_data is not None and not selected_data.empty:
             data_to_use = selected_data[selected_filter]
