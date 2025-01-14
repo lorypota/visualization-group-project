@@ -190,7 +190,7 @@ def sanity_checks(df):
     Drops all entries where entries do not satisfy sanity checks
     """
     #temp 1 outlier max temp, lower temps look okay
-    max_temp = 150
+    max_temp = 134 #134F is the highest recorded temp on earth
     old_size = df.shape[0]
     count_temp= df[df['TEMP'] < max_temp].shape[0]
     print(f"Deleting {old_size - count_temp} based on temp")
@@ -205,7 +205,7 @@ def sanity_checks(df):
 
 pd.set_option('display.max_columns', None)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(current_dir, 'Railroad_Incidents', 'Dataset.csv')
+data_path = os.path.join(current_dir, 'Dataset.csv')
 df_railroad = pd.read_csv(data_path, delimiter=',', low_memory=False)
 
 df_railroad = drop_dummy_columns(df_railroad)
@@ -224,7 +224,7 @@ if DROP_0_COORD:
     df_railroad=drop_0_coord_entries(df_railroad)
 df_railroad = sanity_checks(df_railroad)    
 df_railroad = replace_alcohol_drug_nan(df_railroad)
-dest_path = os.path.join(current_dir, 'Railroad_Incidents', 'CleanedDataset.csv')
+dest_path = os.path.join(current_dir, 'CleanedDataset.csv')
 df_railroad.to_csv(dest_path, sep=',', index=False)
 
 
