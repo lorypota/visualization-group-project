@@ -132,12 +132,10 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
     # Remove existing traces
     fig.data = []
     if len(selected_markers) > 0:
-        print("I AM HERE !!")
         selected_data_copy = st.session_state.callback_data.get('selected_data_back', [])
         unselected_data_copy = st.session_state.callback_data.get('unselected_data_back', [])
         selected_data_copy = selected_data_copy[selected_filter]
-        # unselected_data_copy = data[~selected_filter]
-        
+        unselected_data_copy = pd.concat([pd.DataFrame(unselected_data_copy), data[~selected_filter]], ignore_index=True)
         # Add the unselected trace first
         fig.add_scattermapbox(
             lat=unselected_data_copy["Latitude"].tolist(),
