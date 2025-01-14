@@ -15,7 +15,7 @@ DEFAULT_STYLE = "mapbox://styles/mapbox/streets-v12"
 STYLE = "mapbox://styles/mggiordano/cm4iq6416000601s89eyagmeu" # currently not used
 
 # File paths
-DATA_PATH = 'Railroad_Incidents/CleanedDataset.csv'
+DATA_PATH = 'Railroad_Incidents_Data/CleanedDataset.csv'
 
 # Map configurations
 MAP_CONFIGS = {
