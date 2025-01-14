@@ -1,7 +1,5 @@
 import os
 from dotenv import load_dotenv
-from constants import *
-from plots import *
 
 # Load environment variables
 load_dotenv()
