@@ -162,9 +162,9 @@ DESCRIPTION_MAPPINGS = {
 def plot_bar_chart(data, categorical_var, numerical_var):
     """
     Creates a bar chart comparing a categorical variable and a numerical variable.
-    :data: (pd.DataFrame) The dataset containing the variables to be plotted.
-    :categorical_var: (str) The name of the categorical variable to group data by.
-    :numerical_var: (str) The name of the numerical variable to aggregate data.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param categorical_var: (str) The name of the categorical variable to group data by.
+    :param numerical_var: (str) The name of the numerical variable to aggregate data.
     :return: A bar chart showing the relationship between the categorical and numerical variables.
     """
     cat_var_data = VARNAMES_TO_DATASET[categorical_var]
@@ -204,9 +204,9 @@ def plot_bar_chart(data, categorical_var, numerical_var):
 def plot_line_chart(data, x_var, y_var):
     """
     Creates a line chart comparing an x-axis variable and a y-axis variable.
-    :data: (pd.DataFrame) The dataset containing the variables to be plotted.
-    :x_var: (str) The name of the variable to be plotted on the x-axis.
-    :y_var: (str) The name of the variable to be plotted on the y-axis.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param x_var: (str) The name of the variable to be plotted on the x-axis.
+    :param y_var: (str) The name of the variable to be plotted on the y-axis.
     :return: A line chart visualizing the relationship between the x-axis and y-axis variables.        
     """
     x_var_data = VARNAMES_TO_DATASET[x_var]
@@ -241,9 +241,9 @@ def plot_line_chart(data, x_var, y_var):
 def plot_scatter(data, x_var, y_var):
     """
     Creates a scatter plot showing the relationship between two variables.
-    :data: (pd.DataFrame) The dataset containing the variables to be plotted.
-    :x_var: (str) The name of the variable to be plotted on the x-axis.
-    :y_var: (str) The name of the variable to be plotted on the y-axis.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param x_var: (str) The name of the variable to be plotted on the x-axis.
+    :param y_var: (str) The name of the variable to be plotted on the y-axis.
     :return: A scatter plot visualizing the relationship between the x-axis and y-axis variables.
     """
     x_var_data = VARNAMES_TO_DATASET[x_var]
@@ -266,11 +266,11 @@ def plot_scatter(data, x_var, y_var):
 def make_bins(var, data, dims, labs, binning):
     """
     Creates bins for a specified variable and updates the dimensions for a parallel plot.
-    :var: (str) The name of the variable to be binned.
-    :data: (pd.DataFrame) The dataset containing the variable.
-    :dims: (list) The list of dimensions to update for the parallel plot.
-    :labs: (dict) A dictionary to store labels for the parallel plot.
-    :binning: (bool) A flag indicating whether to apply binning or use raw values.
+    :param var: (str) The name of the variable to be binned.
+    :param data: (pd.DataFrame) The dataset containing the variable.
+    :param dims: (list) The list of dimensions to update for the parallel plot.
+    :param labs: (dict) A dictionary to store labels for the parallel plot.
+    :param binning: (bool) A flag indicating whether to apply binning or use raw values.
     :return: The name of the numeric column created for the binned variable or None if no numeric column was created.
     """
     if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight"]:
@@ -377,9 +377,9 @@ def make_bins(var, data, dims, labs, binning):
 def parallel_plot(data, selected_vars, binning):
     """
     Create a parallel coordinates plot based on the selected variables.
-    :data: The dataset to use for the plot
-    :selected_vars: The selected variables to plot
-    :binning: Whether to bin the continuous variables
+    :param data: The dataset to use for the plot
+    :param selected_vars: The selected variables to plot
+    :param binning: Whether to bin the continuous variables
     :return: The parallel coordinates plot
     """
     dims = []

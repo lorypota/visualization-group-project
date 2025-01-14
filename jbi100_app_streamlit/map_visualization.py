@@ -9,6 +9,11 @@ selected_data = None
 unselected_data = None
 
 def create_base_figure():
+    """
+    Creates a base map figure using Plotly ScatterMapbox.
+    Configures the map to display the continental USA with bounding box constraints.
+    :return: A Plotly figure object.
+    """
     config = MAP_CONFIGS["Continental USA"]
     fig = px.scatter_mapbox(
         lat=[],
@@ -31,6 +36,10 @@ def create_base_figure():
 
 
 def initialize_data():
+    """
+    Initializes and loads the map data into the session state.
+    If not already loaded, reads the dataset and converts relevant columns.
+    """
     if 'map_data' not in st.session_state:
         data = pd.read_csv(DATA_PATH, low_memory=False)
         data['DATETIME'] = pd.to_datetime(data['DATETIME'])
@@ -38,11 +47,21 @@ def initialize_data():
 
 
 def initialize_figure():
+    """
+    Initializes and stores the base map figure in the session state.
+    If not already initialized, creates the figure.
+    """
     if 'fig' not in st.session_state:
         st.session_state.fig = create_base_figure()
 
 
 def map(fig, data, selected_filter):
+    """
+    Renders the main map figure in Streamlit and updates data based on user interactions (e.g., marker selection).
+    :param fig: The map figure to display.
+    :param data: The dataset containing map data.
+    :param selected_filter: The filter applied to the dataset for the map.
+    """
     selected_markers = st.plotly_chart(
         st.session_state.fig,
         key="main_map",
@@ -80,14 +99,27 @@ def map(fig, data, selected_filter):
 
 
 def marker_properties_selected():
+    """
+    Returns marker properties for selected data points.
+    """
     return dict(size=6, opacity=0.8, color='red')
 
 
 def marker_properties_unselected():
+    """
+    Returns marker properties for unselected data points.
+    """
     return dict(size=6, opacity=0.5, color='#FFCCCB')
 
 
 def update_figure_data(fig, data, selected_filter, selected_markers=[]):
+    """
+    Updates the map figure with data for selected and unselected markers.
+    :param fig: The map figure to update.
+    :param data: The dataset containing the map data.
+    :param selected_filter: Filter applied to the dataset.
+    :param selected_markers: Data for markers manually selected on the map.
+    """
     # Separate selected and unselected data
     global selected_data
     global unselected_data
@@ -195,10 +227,12 @@ def update_figure_data(fig, data, selected_filter, selected_markers=[]):
     
     
 def check_single_event():
+    """
+    Checks if a single event is selected and displays detailed information if true.
+    :return: Boolean indicating whether a single event is selected.
+    """
+
     global selected_data
-    
-    # Debugging: Print the length and columns of the selected data
-    # print('This is the length of selected data:', len(selected_data))
     
     # Check if only one event is selected
     if len(selected_data) == 1:
@@ -263,6 +297,10 @@ def check_single_event():
 
 
 def bar_callback():
+    """
+    Callback function triggered when a bar chart selection is made.
+    Extracts selected points, identifies corresponding data, and updates session state with selected/unselected markers.
+    """
     if st.session_state.bottom_panel:
         # Access the selected points from the bar chart
         selected_points = st.session_state.bottom_panel['selection']['points']
@@ -343,11 +381,18 @@ def bar_callback():
                     'second_selected_var_back': y_var
                 }
         
-        print(f"x_values type: {type(x_values[0])}")
-        print(f"TYPE column dtype: {data[x_var_col].dtype}")
+        # print(f"x_values type: {type(x_values[0])}")
+        # print(f"TYPE column dtype: {data[x_var_col].dtype}")
 
 
 def simple_graph(key, selected_filter, selected_variable, second_selected_var):   # ex update_bottom_panel
+    """
+    Generates a graph based on the selected variable and secondary variable.
+    :param key: The tuple identifying the plot function.
+    :param selected_filter: The filters that the user selected.
+    :param selected_variable: The primary variable for the plot.
+    :param second_selected_var: The secondary variable for the plot.
+    """
     st.session_state.callback_data['selected_markers'] = []
     if key in PLOT_FUNCTIONS:
         global selected_data
@@ -385,6 +430,12 @@ def simple_graph(key, selected_filter, selected_variable, second_selected_var): 
 
 
 def parallel_coord_plot(selected_filter, par_plot_vars, binning):
+    """
+    Generates and displays a parallel coordinates plot based on selected variables.
+    :param selected_filter: The filters that the user selected.
+    :param par_plot_vars: List of variables to include in the parallel coordinates plot.
+    :param binning: Boolean flag to enable or disable binning for continuous variables.
+    """
     global selected_data
 
     if len(selected_data) == 0:
