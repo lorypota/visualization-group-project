@@ -117,13 +117,13 @@ COSTS_BUCKETS = [
 ]
 
 VARIABLES = {
-    "💥 Incident Type": ["🔢 Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌥️ Weather": ["🔢 Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌫️ Visibility": ["🔢 Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🚊 Track Type": ["🔢 Number of Accidents", "🗓️ Year", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🗓️ Year": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌡️ Temperature": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🚄 Speed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Year", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "💥 Incident Type": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌥️ Weather": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌫️ Visibility": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🚊 Track Type": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🗓️ Date": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌡️ Temperature": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Date", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🚄 Speed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Date", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
     "🤕 Total People Injured" : ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🪦 Total People Killed", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
     "🪦 Total People Killed": ["🔢 Number of Accidents", "💥 Incident Type","🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
 }
@@ -133,7 +133,7 @@ VARNAMES_TO_DATASET = {
     "🌥️ Weather": "WEATHER",
     "🌫️ Visibility": "VISIBLTY",
     "🚊 Track Type": "TYPTRK",
-    "🗓️ Year": "YEAR",
+    "🗓️ Date": "DATETIME",
     "🚄 Speed" : "TRNSPD",
     "🌡️ Temperature" : "TEMP",
     "🇺🇸 State": "STATE",
@@ -377,20 +377,39 @@ def parallel_plot(data, selected_vars, binning):
     return fig
  
 
+def plot_year_month_heatmap(data, x_var, y_var):
+    df = data.copy()
+    df['YEAR'] = df['DATETIME'].dt.year
+    df['MONTH'] = df['DATETIME'].dt.month
+    grouped = df.groupby(['YEAR', 'MONTH']).size().reset_index(name='counts')
+    pivoted = grouped.pivot(index='YEAR', columns='MONTH', values='counts').fillna(0)
+
+    fig = px.imshow(
+        pivoted,
+        labels={'x': 'Month', 'y': 'Year', 'color': 'Incidents'},
+        x=pivoted.columns,
+        y=pivoted.index,
+        color_continuous_scale='Blues',
+        aspect='auto'
+    )
+    fig.update_layout(title='Year-Month Heatmap of Incidents')
+    return fig
+
+
 PLOT_FUNCTIONS = { ("🌥️ Weather", "🔢 Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "🔢 Number of Accidents"): plot_bar_chart,
                   ("🚊 Track Type", "🔢 Number of Accidents"): plot_bar_chart,
                   ("💥 Incident Type", "🔢 Number of Accidents"): plot_bar_chart,
-                  ("🗓️ Year", "🔢 Number of Accidents"): plot_line_chart,
+                  ("🗓️ Date", "🔢 Number of Accidents"): plot_year_month_heatmap,
                   ("🚄 Speed", "🔢 Number of Accidents"): plot_line_chart,
                   ("🌡️ Temperature", "🔢 Number of Accidents"): plot_line_chart,
                   ("🪦 Total People Killed", "🔢 Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS 
                   ("🤕 Total People Injured", "🔢 Number of Accidents"): plot_line_chart, #NOT COMPLETELY CONTINUOUS
-                  ("🗓️ Year", "🚄 Speed"): plot_scatter,
-                  ("🗓️ Year", "💸 Total Damage Costs") : plot_scatter,
-                  ("🗓️ Year", "🪦 Total People Killed") : plot_scatter,
-                  ("🗓️ Year", "🤕 Total People Injured") : plot_scatter,
-                  ("🗓️ Year", "🌡️ Temperature") : plot_scatter,
+                  ("🗓️ Date", "🚄 Speed"): plot_scatter,
+                  ("🗓️ Date", "💸 Total Damage Costs") : plot_scatter,
+                  ("🗓️ Date", "🪦 Total People Killed") : plot_scatter,
+                  ("🗓️ Date", "🤕 Total People Injured") : plot_scatter,
+                  ("🗓️ Date", "🌡️ Temperature") : plot_scatter,
                   ("🚄 Speed", "💸 Total Damage Costs") : plot_scatter,
                   ("🚄 Speed", "🪦 Total People Killed") : plot_scatter,
                   ("🚄 Speed", "🤕 Total People Injured") : plot_scatter,  
