@@ -11,11 +11,13 @@ def filter_by_date(data, start_date, end_date):
         (data['DATETIME'] <= pd.to_datetime(end_date))
     ]
 
+
 def filter_by_temperature(data, start_temp, end_temp):
     """Filter map data based on selected temperature range"""
     return data[
         (data['TEMP'] >= start_temp & data['TEMP'] <= end_temp)
     ]
+
 
 def filter_by_states(data, selected_states):
     """Filter map data based on selected states."""
@@ -38,12 +40,12 @@ def filter_by_visibility(data, selected_vis):
                          if selected_vis.get(description, False)]
     return data[data['VISIBLTY'].isin(selected_vis_codes)]
 
+
 def filter_by_weather(data, selected_weather):
     """Filter map data based on selected weather categories"""
     selected_weather_codes = [int(code) for code, description in WEATHER_DESCRIPTIONS.items()
                               if selected_weather.get(description, False)]
     return data[data['WEATHER'].isin(selected_weather_codes)]
-
 
 
 def filter_by_region(data, region):
@@ -55,6 +57,7 @@ def filter_by_region(data, region):
         return data[(data['Latitude'] > 50) & (data['Longitude'] < -130)]
     else:  # Continental USA
         return data[~((data['Latitude'] > 50) & (data['Longitude'] < -130))]
+
 
 def bucket_to_numeric(bucket, data):
     if bucket == "0":
@@ -76,10 +79,12 @@ def bucket_to_numeric(bucket, data):
     elif bucket == "20+ million":
         return int(math.ceil(data['ACCDMG'].max()))
     
+
 def bucket_to_numeric_injured(bucket, data):
     if bucket == "100+":
         return int(math.ceil(data['TOTINJ'].max()))  # Use infinity for open-ended range
     return bucket  # Return numeric values as is
+
 
 def setup_filters(map_data):
     st.sidebar.header("Filters")
@@ -317,5 +322,3 @@ def setup_filters(map_data):
     )
 
     return selected_filter
-
-
