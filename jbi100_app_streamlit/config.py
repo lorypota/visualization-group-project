@@ -40,7 +40,7 @@ STATE_CODES = {
     54: 'WV', 55: 'WI', 56: 'WY'
 }
 
-# Type descriptions
+# Incident type descriptions
 TYPE_DESCRIPTIONS = {
     '01': 'Derailment',
     '02': 'Head on collision',
@@ -57,6 +57,7 @@ TYPE_DESCRIPTIONS = {
     '13': 'Other'
 }
 
+# Descriptions for visibility, weather, and track types
 VIS_DESCRIPTIONS = {
     '1': 'Dawn',
     '2': 'Day',
@@ -80,7 +81,7 @@ TRACK_DESCRIPTIONS = {
     '4': 'Industry',
 }
 
-
+# Numeric buckets used for grouping the number of injuries into ranges
 INJURED_BUCKETS = [
     0,
     5,
@@ -92,7 +93,7 @@ INJURED_BUCKETS = [
     "100+"
 ]
 
-
+# Lambda functions to categorize injury counts into buckets
 INJURED_BUCKETS2 = {
     "0": lambda x: x == 0,
     "1-5": lambda x: (x > 0) & (x < 6),
@@ -104,6 +105,7 @@ INJURED_BUCKETS2 = {
     "100+": lambda x: x > 99
 }
 
+# Cost buckets (used for grouping damage costs into ranges)
 COSTS_BUCKETS = [
     "0",
     "0.25 million",
@@ -116,6 +118,7 @@ COSTS_BUCKETS = [
     "20+ million"
 ]
 
+# Variables and their corresponding related variables for plots
 VARIABLES = {
     "💥 Incident Type": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
     "🌥️ Weather": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
@@ -128,6 +131,7 @@ VARIABLES = {
     "🪦 Total People Killed": ["🔢 Number of Accidents", "💥 Incident Type","🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
 }
 
+# Maps variable names to dataset column names
 VARNAMES_TO_DATASET = {
     "🔢 Number of Accidents": "🔢 Number of Accidents" ,
     "🌥️ Weather": "WEATHER",
@@ -146,7 +150,7 @@ VARNAMES_TO_DATASET = {
     "💉 Drugs": "DRUG"
 }
 
-
+# Description mappings for variables with specific codes
 DESCRIPTION_MAPPINGS = {
     "🌥️ Weather": WEATHER_DESCRIPTIONS,
     "🌫️ Visibility": VIS_DESCRIPTIONS,
@@ -156,6 +160,13 @@ DESCRIPTION_MAPPINGS = {
 
 
 def plot_bar_chart(data, categorical_var, numerical_var):
+    """
+    Creates a bar chart comparing a categorical variable and a numerical variable.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param categorical_var: (str) The name of the categorical variable to group data by.
+    :param numerical_var: (str) The name of the numerical variable to aggregate data.
+    :return: A bar chart showing the relationship between the categorical and numerical variables.
+    """
     cat_var_data = VARNAMES_TO_DATASET[categorical_var]
     num_var_data = VARNAMES_TO_DATASET[numerical_var]
     # Get axis labels
@@ -172,7 +183,6 @@ def plot_bar_chart(data, categorical_var, numerical_var):
     if num_var_data == "🔢 Number of Accidents":
         grouped_data = data.groupby(cat_var_data).size().reset_index(name='Counts')
     else:
-        
         grouped_data = data.groupby(cat_var_data)[num_var_data].mean().reset_index()
     
     # Create the bar chart
@@ -192,6 +202,13 @@ def plot_bar_chart(data, categorical_var, numerical_var):
 
 
 def plot_line_chart(data, x_var, y_var):
+    """
+    Creates a line chart comparing an x-axis variable and a y-axis variable.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param x_var: (str) The name of the variable to be plotted on the x-axis.
+    :param y_var: (str) The name of the variable to be plotted on the y-axis.
+    :return: A line chart visualizing the relationship between the x-axis and y-axis variables.        
+    """
     x_var_data = VARNAMES_TO_DATASET[x_var]
     y_var_data = VARNAMES_TO_DATASET[y_var]
     
@@ -222,6 +239,13 @@ def plot_line_chart(data, x_var, y_var):
 
 
 def plot_scatter(data, x_var, y_var):
+    """
+    Creates a scatter plot showing the relationship between two variables.
+    :param data: (pd.DataFrame) The dataset containing the variables to be plotted.
+    :param x_var: (str) The name of the variable to be plotted on the x-axis.
+    :param y_var: (str) The name of the variable to be plotted on the y-axis.
+    :return: A scatter plot visualizing the relationship between the x-axis and y-axis variables.
+    """
     x_var_data = VARNAMES_TO_DATASET[x_var]
     y_var_data = VARNAMES_TO_DATASET[y_var]
     
@@ -240,6 +264,15 @@ def plot_scatter(data, x_var, y_var):
 
 
 def make_bins(var, data, dims, labs, binning):
+    """
+    Creates bins for a specified variable and updates the dimensions for a parallel plot.
+    :param var: (str) The name of the variable to be binned.
+    :param data: (pd.DataFrame) The dataset containing the variable.
+    :param dims: (list) The list of dimensions to update for the parallel plot.
+    :param labs: (dict) A dictionary to store labels for the parallel plot.
+    :param binning: (bool) A flag indicating whether to apply binning or use raw values.
+    :return: The name of the numeric column created for the binned variable or None if no numeric column was created.
+    """
     if var in ["🌡️ Temperature", "🚄 Speed", "💸 Total Damage Costs", "🪨 Weight"]:
         # Define bin names and units
         non_negative = False
@@ -262,13 +295,12 @@ def make_bins(var, data, dims, labs, binning):
         name_numeric = name + "_numeric"
         labs[name_numeric] = var
 
+        # Create bins for the variable
         var_column = VARNAMES_TO_DATASET[var]
         data[name] = pd.cut(data[var_column], bins=10, precision=1, duplicates="drop")
         data[name_numeric] = data[name].cat.codes
-
-        bin_counts = data[name].value_counts()
-        data[f"{name}_count"] = data[name].map(bin_counts)
     
+        # Adjust tick labels for non-negative variables to remove negative ranges
         if non_negative:
             ticktext = [str(interval) for interval in data[name].cat.categories]
             tokens = ticktext[0].split(",")
@@ -278,6 +310,7 @@ def make_bins(var, data, dims, labs, binning):
         else:
             ticktext = [str(interval) for interval in data[name].cat.categories]
 
+        # Add dimension to the parallel coordinates plot
         if binning:
             dims.append({
                 "label": f"{var} ({unit})",
@@ -293,9 +326,11 @@ def make_bins(var, data, dims, labs, binning):
 
         return name_numeric
     else:
+        # For non-binned categorical variables
         labs[VARNAMES_TO_DATASET[var]] = var
         var_column = VARNAMES_TO_DATASET[var]
 
+        # Add specific formatting for certain categorical variables
         if var == "🍷 Alcohol":
             dims.append({
                 "label": f"{var} (# of positive tests)",
@@ -340,9 +375,17 @@ def make_bins(var, data, dims, labs, binning):
     
 
 def parallel_plot(data, selected_vars, binning):
+    """
+    Create a parallel coordinates plot based on the selected variables.
+    :param data: The dataset to use for the plot
+    :param selected_vars: The selected variables to plot
+    :param binning: Whether to bin the continuous variables
+    :return: The parallel coordinates plot
+    """
     dims = []
     labs = {}
 
+    # Process each selected variable: create bins for continuous variables and add dimensions
     for var in selected_vars:
         if var != "-- empty --":
             make_bins(var, data, dims, labs, binning)
@@ -395,7 +438,7 @@ def plot_year_month_heatmap(data, x_var, y_var):
     fig.update_layout(title='Year-Month Heatmap of Incidents')
     return fig
 
-
+# Maps the selected variable combination to the corresponding plot function
 PLOT_FUNCTIONS = { ("🌥️ Weather", "🔢 Number of Accidents"): plot_bar_chart, 
                   ("🌫️ Visibility", "🔢 Number of Accidents"): plot_bar_chart,
                   ("🚊 Track Type", "🔢 Number of Accidents"): plot_bar_chart,

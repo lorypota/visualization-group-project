@@ -34,6 +34,7 @@ def main():
         # Display the map visualization
         map(st.session_state.fig, map_data, selected_filter)
 
+    # If not viewing a single event, show additional visualizations
     if not check_single_event():
         padding_left, container1, padding_right = st.columns([0.02, 1, 0.02], gap="large")
 
@@ -78,6 +79,7 @@ def main():
 
             box3, box4, box5, box6 = st.columns([1, 1, 1, 1])  
 
+            # Define the available variables for the parallel coordinate plot
             parallel_plot_variables = ["🌡️ Temperature", "🌥️ Weather", "🌫️ Visibility",
                                        "🚄 Speed", "🚊 Track Type", "💸 Total Damage Costs", "🪨 Weight", 
                                        "🍷 Alcohol", "💉 Drugs", 
@@ -122,7 +124,6 @@ def main():
                         options=parallel_plot_variables2,
                         index=4
                     )
-            
 
         padding_left4, container4, padding_right4 = st.columns([0.05, 1, 0.05], gap="medium")
         par_plot_vars = [par_plot_var_1, par_plot_var_2, par_plot_var_3, par_plot_var_4]
