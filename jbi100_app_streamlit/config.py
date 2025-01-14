@@ -81,7 +81,6 @@ TRACK_DESCRIPTIONS = {
 }
 
 
-
 INJURED_BUCKETS = [
     0,
     5,
@@ -175,8 +174,6 @@ def plot_bar_chart(data, categorical_var, numerical_var):
     else:
         
         grouped_data = data.groupby(cat_var_data)[num_var_data].mean().reset_index()
-
-    
     
     # Create the bar chart
     fig = px.bar(
@@ -320,6 +317,20 @@ def make_bins(var, data, dims, labs, binning):
                 "tickvals": [1, 2, 3, 4],
                 "ticktext": ["Main", "Yard", "Siding", "Industry"]
             })
+        elif var == "🌥️ Weather":
+            dims.append({
+                "label": var,
+                "values": data[var_column],
+                "tickvals": list(WEATHER_DESCRIPTIONS.keys()),
+                "ticktext": list(WEATHER_DESCRIPTIONS.values())
+            })
+        elif var == "🌫️ Visibility":
+            dims.append({
+                "label": var,
+                "values": data[var_column],
+                "tickvals": list(VIS_DESCRIPTIONS.keys()),
+                "ticktext": list(VIS_DESCRIPTIONS.values())
+            })
         else:
             dims.append({
                 "label": var,
@@ -327,8 +338,6 @@ def make_bins(var, data, dims, labs, binning):
             })
         return None
     
-    
-import plotly.graph_objects as go
 
 def parallel_plot(data, selected_vars, binning):
     dims = []

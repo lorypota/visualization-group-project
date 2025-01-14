@@ -29,15 +29,18 @@ def create_base_figure():
     )
     return fig
 
+
 def initialize_data():
     if 'map_data' not in st.session_state:
         data = pd.read_csv(DATA_PATH, low_memory=False)
         data['DATETIME'] = pd.to_datetime(data['DATETIME'])
         st.session_state.map_data = data
 
+
 def initialize_figure():
     if 'fig' not in st.session_state:
         st.session_state.fig = create_base_figure()
+
 
 def map(fig, data, selected_filter):
     selected_markers = st.plotly_chart(
@@ -75,11 +78,14 @@ def map(fig, data, selected_filter):
             lambda row: (row['Latitude'], row['Longitude']) not in selected_coords, axis=1
         )].copy()
 
+
 def marker_properties_selected():
     return dict(size=6, opacity=0.8, color='red')
 
+
 def marker_properties_unselected():
     return dict(size=6, opacity=0.5, color='#FFCCCB')
+
 
 def update_figure_data(fig, data, selected_filter, selected_markers=[]):
     # Separate selected and unselected data
