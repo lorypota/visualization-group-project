@@ -3,7 +3,9 @@ import plotly.express as px
 import pandas as pd
 import json
 from datetime import date
-from config import *
+from config import DATA_PATH, MAP_CONFIGS, MAPBOX_ACCESS_TOKEN, DEFAULT_STYLE
+from constants import STATE_CODES, VARNAMES_TO_DATASET, TYPE_DESCRIPTIONS, VIS_DESCRIPTIONS, WEATHER_DESCRIPTIONS, TRACK_DESCRIPTIONS, PLOT_FUNCTIONS
+from plots import parallel_plot
 
 selected_data = None
 unselected_data = None

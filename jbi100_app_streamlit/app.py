@@ -4,7 +4,7 @@ import streamlit as st
 from filters import setup_filters
 from map_visualization import update_figure_data, map, initialize_data, initialize_figure, check_single_event,  simple_graph, parallel_coord_plot
 from styles import CSS_STYLE
-from config import VARIABLES, PLOT_FUNCTIONS
+from constants import VARIABLES, PLOT_FUNCTIONS
 import plotly.express as px
 
 st.set_page_config(layout="wide", page_icon="🚆", page_title="RailAlert!")
