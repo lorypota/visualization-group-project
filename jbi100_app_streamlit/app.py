@@ -113,7 +113,7 @@ def main():
                     par_plot_var_3 = st.selectbox(
                         "Third variable",
                         options=parallel_plot_variables2,
-                        index=3
+                        index=4
                     )
 
             with box6:
@@ -122,7 +122,7 @@ def main():
                     par_plot_var_4 = st.selectbox(
                         "Fourth variable",
                         options=parallel_plot_variables2,
-                        index=4
+                        index=5
                     )
 
         padding_left4, container4, padding_right4 = st.columns([0.05, 1, 0.05], gap="medium")
