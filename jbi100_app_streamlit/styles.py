@@ -23,7 +23,10 @@ CSS_STYLE = '''
     .block-container {
         padding: 0 !important;
     }
-    .stMainBlockContainer .stVerticalBlock {
+    .stMainBlockContainer .stHorizontalBlock{
+        gap: 0rem !important;
+    }
+    .stMainBlockContainer .stVerticalBlock{
         gap: 0rem !important;
     }
 </style>

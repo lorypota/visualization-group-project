@@ -39,10 +39,9 @@ def main():
         padding_left, container1, padding_right = st.columns([0.02, 1, 0.02], gap="large")
 
         with container1:
-            st.write("")
-            st.write("")
-
-            box1, box2 = st.columns([1, 1])  # Use equal column widths
+            st.title("Bi-variate plots")
+            st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
+            _, box1, _, box2, _ = st.columns([1, 2, 0.5, 2, 1])
 
             with box1:
                 # First variable selection
@@ -74,10 +73,10 @@ def main():
         padding_left3, container3, padding_right3 = st.columns([0.02, 1, 0.02], gap="large")
 
         with container3:
-            st.write("")
-            st.write("")
-
-            box3, box4, box5, box6 = st.columns([1, 1, 1, 1])  
+            st.title("Parallel Coordinate Plot")
+            st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
+            _, box3, _, box4, _, box5, _, box6, _ = st.columns([1, 2, 0.3, 2, 0.3, 2, 0.3, 2, 1])
+            st.markdown('<div style="margin-top: 4rem;"></div>', unsafe_allow_html=True)
 
             # Define the available variables for the parallel coordinate plot
             parallel_plot_variables = ["🌡️ Temperature", "🌥️ Weather", "🌫️ Visibility",
