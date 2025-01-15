@@ -36,10 +36,10 @@ def main():
 
     # If not viewing a single event, show additional visualizations
     if not check_single_event():
-        padding_left, container1, padding_right = st.columns([0.02, 1, 0.02], gap="large")
+        _, container1, _ = st.columns([0.02, 1, 0.02], gap="large")
 
         with container1:
-            st.title("Bi-variate plots")
+            st.title("Explore the Data")
             st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
             _, box1, _, box2, _ = st.columns([1, 2, 0.5, 2, 1])
 
@@ -60,7 +60,7 @@ def main():
                         key=f"dropdown_{selected_variable}"
                     )
 
-        padding_left2, container2, padding_right2 = st.columns([0.1, 1, 0.1], gap="large")
+        _, container2, _ = st.columns([0.1, 1, 0.1], gap="large")
 
         with container2:
             if selected_variable and second_selected_var:
@@ -73,7 +73,7 @@ def main():
         padding_left3, container3, padding_right3 = st.columns([0.02, 1, 0.02], gap="large")
 
         with container3:
-            st.title("Parallel Coordinate Plot")
+            st.title("Combine!")
             st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
             _, box3, _, box4, _, box5, _, box6, _ = st.columns([1, 2, 0.3, 2, 0.3, 2, 0.3, 2, 1])
             st.markdown('<div style="margin-top: 4rem;"></div>', unsafe_allow_html=True)

@@ -205,15 +205,15 @@ INJURED_BUCKETS = [
 
 # Variables and their corresponding related variables for plots
 VARIABLES = {
-    "💥 Incident Type": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌥️ Weather": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌫️ Visibility": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🚊 Track Type": ["🔢 Number of Accidents", "🗓️ Date", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🗓️ Date": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🌡️ Temperature": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Date", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🚄 Speed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🗓️ Date", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
-    "🤕 Total People Injured": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🪦 Total People Killed", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"],
-    "🪦 Total People Killed": ["🔢 Number of Accidents", "💥 Incident Type", "🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "🚊 Track Type", "🌥️ Weather", "🌫️ Visibility", "💸 Total Damage Costs"]
+    "💥 Incident Type": ["🔢 Number of Accidents", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌥️ Weather": ["🔢 Number of Accidents", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌫️ Visibility": ["🔢 Number of Accidents", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🚊 Track Type": ["🔢 Number of Accidents", "🚄 Speed", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🗓️ Date": ["🔢 Number of Accidents", "🚄 Speed", "🌡️ Temperature", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🌡️ Temperature": ["🔢 Number of Accidents"],
+    "🚄 Speed": ["🔢 Number of Accidents", "🌡️ Temperature", "💸 Total Damage Costs", "🤕 Total People Injured", "🪦 Total People Killed"],
+    "🤕 Total People Injured": ["🔢 Number of Accidents", "🚄 Speed", "🌡️ Temperature", "🪦 Total People Killed", "💸 Total Damage Costs"],
+    "🪦 Total People Killed": ["🔢 Number of Accidents", "🚄 Speed", "🌡️ Temperature", "🤕 Total People Injured", "💸 Total Damage Costs"]
 }
 
 # Maps the selected variable combination to the corresponding plot function
