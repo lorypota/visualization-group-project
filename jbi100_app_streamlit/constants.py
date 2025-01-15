@@ -225,9 +225,7 @@ PLOT_FUNCTIONS = {
     ("🗓️ Date", "🔢 Number of Accidents"): plot_year_month_heatmap,
     ("🚄 Speed", "🔢 Number of Accidents"): plot_line_chart,
     ("🌡️ Temperature", "🔢 Number of Accidents"): plot_line_chart,
-    # NOT COMPLETELY CONTINUOUS
-    ("� Total People Killed", "🔢 Number of Accidents"): plot_line_chart,
-    # NOT COMPLETELY CONTINUOUS
+    ("🪦 Total People Killed", "🔢 Number of Accidents"): plot_line_chart,
     ("🤕 Total People Injured", "🔢 Number of Accidents"): plot_line_chart,
     ("🗓️ Date", "🚄 Speed"): plot_scatter,
     ("🗓️ Date", "💸 Total Damage Costs"): plot_scatter,
