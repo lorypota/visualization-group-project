@@ -81,13 +81,13 @@ def main():
             # Define the available variables for the parallel coordinate plot
             parallel_plot_variables = ["🌡️ Temperature", "🌥️ Weather", "🌫️ Visibility",
                                        "🚄 Speed", "🚊 Track Type", "🛤️ Track Class", "💸 Total Damage Costs", "🪨 Weight", 
-                                       "🍷 Alcohol", "💉 Drugs", 
+                                       "🍷 Alcohol", "💉 Drugs", "💥 Incident Type", 
                                        "🤕 Total People Injured", "🪦 Total People Killed"]
             
             parallel_plot_variables2 = ["-- empty --", 
                                         "🌡️ Temperature", "🌥️ Weather", "🌫️ Visibility",
                                         "🚄 Speed", "🚊 Track Type", "🛤️ Track Class", "💸 Total Damage Costs", "🪨 Weight",
-                                        "🍷 Alcohol", "💉 Drugs", 
+                                        "🍷 Alcohol", "💉 Drugs", "💥 Incident Type", 
                                         "🤕 Total People Injured", "🪦 Total People Killed"]
             
             with box3:

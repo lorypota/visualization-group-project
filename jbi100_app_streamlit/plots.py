@@ -2,7 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 import seaborn as sns
-from constants import VARNAMES_TO_DATASET, WEATHER_DESCRIPTIONS, VIS_DESCRIPTIONS
+from constants import VARNAMES_TO_DATASET, WEATHER_DESCRIPTIONS, VIS_DESCRIPTIONS, TYPE_DESCRIPTIONS
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -159,6 +159,13 @@ def make_bins(var, data, dims, labs, binning):
                 "values": data[var_column],
                 "tickvals": list(VIS_DESCRIPTIONS.keys()),
                 "ticktext": list(VIS_DESCRIPTIONS.values())
+            })
+        elif var == "💥 Incident Type":
+            dims.append({
+                "label": var,
+                "values": data[var_column],
+                "tickvals": list(TYPE_DESCRIPTIONS.keys()),
+                "ticktext": list(TYPE_DESCRIPTIONS.values())
             })
         else:
             dims.append({
