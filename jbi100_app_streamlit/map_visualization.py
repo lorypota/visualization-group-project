@@ -439,10 +439,20 @@ def parallel_coord_plot(selected_filter, par_plot_vars, binning):
     :param binning: Boolean flag to enable or disable binning for continuous variables.
     """
     global selected_data
+    global unselected_data
+    selected_data_copy = st.session_state.callback_data.get('selected_data_back', [])
+    unselected_data_copy = st.session_state.callback_data.get('unselected_data_back', [])
 
-    if len(selected_data) == 0:
-        selected_data = st.session_state.map_data[selected_filter].copy()
-
-    parallel_fig = parallel_plot(selected_data, par_plot_vars, binning)
+    # Check if selected_data_back is available, otherwise use selected_data, and then map_data
+    if len(selected_data_copy) > 0:
+        selected_data = selected_data_copy
+        unselected_data = unselected_data_copy        
+    
+    if selected_data is not None and not selected_data.empty:
+        data_to_use = selected_data[selected_filter]
+    else:
+        data_to_use = st.session_state.map_data[selected_filter]
+        
+    parallel_fig = parallel_plot(data_to_use, par_plot_vars, binning)
     st.plotly_chart(parallel_fig, use_container_width=True)
  
