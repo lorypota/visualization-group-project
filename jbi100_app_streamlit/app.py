@@ -39,7 +39,7 @@ def main():
         _, container1, _ = st.columns([0.02, 1, 0.02], gap="large")
 
         with container1:
-            st.title("Explore the Data")
+            st.title("Explore the Data!")
             st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
             _, box1, _, box2, _ = st.columns([1, 2, 0.5, 2, 1])
 
