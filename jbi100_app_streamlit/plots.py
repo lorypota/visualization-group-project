@@ -1,7 +1,5 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import plotly.express as px
-import seaborn as sns
 from constants import VARNAMES_TO_DATASET, WEATHER_DESCRIPTIONS, VIS_DESCRIPTIONS, TYPE_DESCRIPTIONS
 import pandas as pd
 import plotly.graph_objects as go

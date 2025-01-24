@@ -1,6 +1,4 @@
 import pandas as pd
-import plotly.express as px
-import numpy as np
 import os
 
 SPARSENESS_THRESHOLD = 0.99 # All columns where there are (SPARSENESS_THRESHOLD * 100)% n/a values will be dropped
